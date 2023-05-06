@@ -35,7 +35,6 @@ impl New for Screen {
     }
 }
 
-// pub type TuiBackend = TermionBackend<Screen>;
 pub type TuiTerminal = tui::Terminal<TermionBackend<Screen>>;
 
 pub struct AppBackend {

@@ -39,9 +39,11 @@ pub fn run_loop(
         context.tab_context_mut().insert_tab(id, tab);
 
         // trigger a preview of child
-        preview_default::load_preview(context, backend);
+        // TODO: put back
+        //preview_default::load_preview(context, backend);
     }
 
+    // TODO: add this back once i isolate how to draw the terminal area with crossterm / termion
     while context.quit == QuitAction::DoNot {
         // do the ui
         if let Ok(area) = backend.terminal_ref().size() {
@@ -49,7 +51,7 @@ pub fn run_loop(
             calculate_ui_context(context, area);
 
             // render the ui
-            backend.render(TuiView::new(context));
+            //backend.render(TuiView::new(context));
 
             // invoke preview hooks, if appropriate
             context.update_external_preview();
@@ -58,53 +60,54 @@ pub fn run_loop(
         // wait for an event and pop it
         let event = match context.poll_event() {
             Ok(event) => event,
-            Err(_) => return Ok(()), // TODO
+            Err(_) => return Ok(()),
         };
 
         // handle the event
-        match event {
-            AppEvent::Termion(Event::Mouse(event)) => {
-                process_event::process_mouse(event, context, backend, &keymap_t);
-                preview_default::load_preview(context, backend);
-            }
-            AppEvent::Termion(key) => {
-                if context.message_queue_ref().current_message().is_some() {
-                    context.message_queue_mut().pop_front();
-                }
-                match key {
-                    // in the event where mouse input is not supported
-                    // but we still want to register scroll
-                    Event::Unsupported(s) => {
-                        process_event::process_unsupported(context, backend, &keymap_t, s);
-                    }
-                    key => match keymap_t.default_view.get(&key) {
-                        None => {
-                            context
-                                .message_queue_mut()
-                                .push_info(format!("Unmapped input: {}", key.to_string()));
-                        }
-                        Some(CommandKeybind::SimpleKeybind(command)) => {
-                            if let Err(e) = command.execute(context, backend, &keymap_t) {
-                                context.message_queue_mut().push_error(e.to_string());
-                            }
-                        }
-                        Some(CommandKeybind::CompositeKeybind(m)) => {
-                            let cmd =
-                                process_event::poll_event_until_simple_keybind(backend, context, m);
+        //match event {
+            //// TODO: put back
+            ////AppEvent::Termion(Event::Mouse(event)) => {
+                ////process_event::process_mouse(event, context, backend, &keymap_t);
+                ////preview_default::load_preview(context, backend);
+            ////}
+            //AppEvent::Termion(key) => {
+                //if context.message_queue_ref().current_message().is_some() {
+                    //context.message_queue_mut().pop_front();
+                //}
+                //match key {
+                    //// in the event where mouse input is not supported
+                    //// but we still want to register scroll
+                    //Event::Unsupported(s) => {
+                        //process_event::process_unsupported(context, backend, &keymap_t, s);
+                    //}
+                    //key => match keymap_t.default_view.get(&key) {
+                        //None => {
+                            //context
+                                //.message_queue_mut()
+                                //.push_info(format!("Unmapped input: {}", key.to_string()));
+                        //}
+                        //Some(CommandKeybind::SimpleKeybind(command)) => {
+                            //if let Err(e) = command.execute(context, backend, &keymap_t) {
+                                //context.message_queue_mut().push_error(e.to_string());
+                            //}
+                        //}
+                        //Some(CommandKeybind::CompositeKeybind(m)) => {
+                            //let cmd =
+                                //process_event::poll_event_until_simple_keybind(backend, context, m);
 
-                            if let Some(command) = cmd {
-                                if let Err(e) = command.execute(context, backend, &keymap_t) {
-                                    context.message_queue_mut().push_error(e.to_string());
-                                }
-                            }
-                        }
-                    },
-                }
-                preview_default::load_preview(context, backend);
-                context.flush_event();
-            }
-            event => process_event::process_noninteractive(event, context),
-        }
+                            //if let Some(command) = cmd {
+                                //if let Err(e) = command.execute(context, backend, &keymap_t) {
+                                    //context.message_queue_mut().push_error(e.to_string());
+                                //}
+                            //}
+                        //}
+                    //},
+                //}
+                //preview_default::load_preview(context, backend);
+                //context.flush_event();
+            //}
+            //event => process_event::process_noninteractive(event, context),
+        //}
 
         // update the file system supervisor that watches for changes in the FS
         if context.config_ref().watch_files {
@@ -114,6 +117,8 @@ pub fn run_loop(
     Ok(())
 }
 
+/// Calculate the overall layout of the UI by finding the area of the terminal and split it with
+/// borders at the correct split locations
 fn calculate_ui_context(context: &mut AppContext, area: Rect) {
     let area = Rect {
         y: area.top() + 1,
