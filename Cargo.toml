@@ -14,6 +14,7 @@ ansi-to-tui = { version = "^2", optional = true }
 alphanumeric-sort = "^1"
 chrono = "^0"
 colors-transform = "^0"
+crossterm = "0.26"
 dirs-next = "^2"
 filetime = "^0"
 globset = "^0"
@@ -33,7 +34,7 @@ structopt = "^0"
 termion = "^1"
 toml = "^0"
 trash = { version = "^2", optional = true }
-tui = { version = "^0", default-features = false, features = ["termion"] }
+tui = { version = "^0", default-features = false, features = ["termion", "crossterm"] }
 unicode-segmentation = "^1"
 unicode-width = "^0"
 users = "^0"

@@ -1,4 +1,5 @@
 mod backend;
+mod backend_crossterm;
 mod preview_area;
 mod rect;
 
