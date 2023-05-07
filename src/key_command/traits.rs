@@ -1,13 +1,20 @@
 use crate::config::AppKeyMapping;
 use crate::context::AppContext;
 use crate::error::JoshutoResult;
-use crate::ui::AppBackend;
+use crate::ui::{CrosstermAppBackend, AppBackend};
 
 pub trait AppExecute {
     fn execute(
         &self,
         context: &mut AppContext,
         backend: &mut AppBackend,
+        keymap_t: &AppKeyMapping,
+    ) -> JoshutoResult;
+
+    fn execute_crossterm(
+        &self,
+        context: &mut AppContext,
+        backend: &mut CrosstermAppBackend,
         keymap_t: &AppKeyMapping,
     ) -> JoshutoResult;
 }

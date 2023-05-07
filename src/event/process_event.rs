@@ -226,6 +226,29 @@ pub fn process_unsupported(
     }
 }
 
+pub fn process_unsupported_crossterm(
+    context: &mut AppContext,
+    backend: &mut ui::CrosstermAppBackend,
+    keymap_t: &AppKeyMapping,
+    event: Vec<u8>,
+) {
+    match event.as_slice() {
+        [27, 79, 65] => {
+            let command = Command::CursorMoveUp { offset: 1 };
+            if let Err(e) = command.execute(context, backend, keymap_t) {
+                context.message_queue_mut().push_error(e.to_string());
+            }
+        }
+        [27, 79, 66] => {
+            let command = Command::CursorMoveDown { offset: 1 };
+            if let Err(e) = command.execute(context, backend, keymap_t) {
+                context.message_queue_mut().push_error(e.to_string());
+            }
+        }
+        _ => {}
+    }
+}
+
 enum Panel {
     Parent,
     Current,

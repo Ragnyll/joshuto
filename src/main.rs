@@ -118,9 +118,12 @@ fn run_main(args: Args) -> Result<i32, JoshutoError> {
 
     let mut context = AppContext::new(config, args.clone());
     {
-        let mut backend: ui::AppBackend = ui::AppBackend::new()?;
-        run::run_loop(&mut backend, &mut context, keymap)?;
+        let mut crossterm_backend = ui::CrosstermAppBackend::new()?;
+        run::run_loop_crossterm(&mut crossterm_backend, &mut context, keymap)?;
+        //let mut termion_backend = ui::AppBackend::new()?;
+        //run::run_loop(&mut termion_backend, &mut context, keymap)?;
     }
+    //std::thread::sleep(std::time::Duration::from_secs(5));
     run_quit(&args, &context)?;
     Ok(context.quit.exit_code())
 }
