@@ -5,7 +5,7 @@ use termion::{
     raw::{IntoRawMode, RawTerminal},
     screen::AlternateScreen,
 };
-use tui::{backend::TermionBackend, widgets::Widget};
+use tui::{backend::TermionBackend, terminal::Terminal, widgets::Widget};
 
 #[cfg(feature = "mouse")]
 use termion::input::MouseTerminal;
@@ -37,14 +37,12 @@ impl New for Screen {
     }
 }
 
-pub type TermionTuiTerminal = tui::Terminal<TermionBackend<Screen>>;
-
 pub struct TermionAppBackend {
-    pub terminal: Option<TermionTuiTerminal>,
+    pub terminal: Option<Terminal<TermionBackend<Screen>>>,
 }
 
 impl AppBackend for TermionAppBackend {
-    type TuiTerminal = TermionTuiTerminal;
+    type TuiTerminal = TermionBackend<Screen>;
 
     fn new() -> io::Result<Self> {
         let mut alt_screen = Screen::new()?;
@@ -69,15 +67,15 @@ impl AppBackend for TermionAppBackend {
         });
     }
 
-    fn terminal(&self) -> Option<Self::TuiTerminal> {
-        self.terminal
+    fn terminal(&self) -> &Option<Terminal<Self::TuiTerminal>> {
+        &self.terminal
     }
 
-    fn terminal_ref(&self) -> &Self::TuiTerminal {
+    fn terminal_ref(&self) -> &Terminal<Self::TuiTerminal> {
         self.terminal.as_ref().unwrap()
     }
 
-    fn terminal_mut(&mut self) -> &mut Self::TuiTerminal {
+    fn terminal_mut(&mut self) -> &mut Terminal<Self::TuiTerminal> {
         self.terminal.as_mut().unwrap()
     }
 
