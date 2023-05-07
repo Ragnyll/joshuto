@@ -10,9 +10,9 @@ use crate::io::{FileOperation, FileOperationOptions, IoWorkerThread};
 use crate::ui::widgets::TuiPrompt;
 use crate::ui::AppBackend;
 
-fn delete_files(
+fn delete_files<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     background: bool,
     permanently: bool,
 ) -> std::io::Result<()> {
@@ -77,9 +77,9 @@ fn delete_files(
     }
 }
 
-pub fn delete_selected_files(
+pub fn delete_selected_files<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     background: bool,
     permanently: bool,
 ) -> JoshutoResult {

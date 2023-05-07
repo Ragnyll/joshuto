@@ -16,8 +16,8 @@ use uuid::Uuid;
 use termion::event::Event;
 use tui::layout::Rect;
 
-pub fn run_loop(
-    backend: &mut ui::AppBackend,
+pub fn run_loop<T: ui::AppBackend>(
+    backend: &mut T,
     context: &mut AppContext,
     keymap_t: AppKeyMapping,
 ) -> std::io::Result<()> {

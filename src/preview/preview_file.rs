@@ -41,9 +41,9 @@ impl std::convert::From<Output> for FilePreview {
 pub struct Background {}
 
 impl Background {
-    pub fn preview_path_with_script(
+    pub fn preview_path_with_script<T: AppBackend>(
         context: &mut AppContext,
-        backend: &mut AppBackend,
+        backend: &mut T,
         path: path::PathBuf,
     ) {
         let preview_options = context.config_ref().preview_options_ref();

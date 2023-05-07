@@ -8,9 +8,9 @@ use crate::traits::ToString;
 use crate::ui::views::TuiWorkerView;
 use crate::ui::AppBackend;
 
-pub fn show_tasks(
+pub fn show_tasks<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
     context.flush_event();

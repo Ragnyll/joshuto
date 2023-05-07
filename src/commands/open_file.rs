@@ -41,9 +41,9 @@ fn _get_options<'a>(path: &path::Path) -> Vec<&'a ProgramEntry> {
     options
 }
 
-fn _open_with_entry<S>(
+fn _open_with_entry<S, T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     option: &ProgramEntry,
     files: &[S],
 ) -> std::io::Result<()>
@@ -61,9 +61,9 @@ where
     Ok(())
 }
 
-fn _open_with_xdg(
+fn _open_with_xdg<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     path: &path::Path,
 ) -> std::io::Result<()> {
     let config = context.config_ref();
@@ -79,9 +79,9 @@ fn _open_with_xdg(
     Ok(())
 }
 
-fn _open_with_helper<S>(
+fn _open_with_helper<S, T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     options: Vec<&ProgramEntry>,
     files: &[S],
 ) -> std::io::Result<()>
@@ -138,7 +138,7 @@ where
     Ok(())
 }
 
-pub fn open(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn open<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     let curr_list = context.tab_context_ref().curr_tab_ref().curr_list_ref();
     let entry = curr_list.and_then(|s| s.curr_entry_ref().cloned());
 
@@ -180,9 +180,9 @@ pub fn open(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult
     Ok(())
 }
 
-pub fn open_with_index(
+pub fn open_with_index<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     index: usize,
 ) -> JoshutoResult {
     let paths = context
@@ -212,7 +212,7 @@ pub fn open_with_index(
     Ok(())
 }
 
-pub fn open_with_interactive(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn open_with_interactive<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     let mut paths = context
         .tab_context_ref()
         .curr_tab_ref()

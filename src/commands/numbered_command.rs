@@ -10,9 +10,9 @@ use crate::key_command::{CommandKeybind, NumberedExecute};
 use crate::ui::views::TuiView;
 use crate::ui::AppBackend;
 
-pub fn numbered_command(
+pub fn numbered_command<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap: &AppKeyMapping,
     first_char: char,
 ) -> JoshutoResult {

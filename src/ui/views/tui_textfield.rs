@@ -74,9 +74,9 @@ impl<'a> TuiTextField<'a> {
         self
     }
 
-    pub fn get_input(
+    pub fn get_input<T: AppBackend>(
         &mut self,
-        backend: &mut AppBackend,
+        backend: &mut T,
         context: &mut AppContext,
     ) -> Option<String> {
         let mut line_buffer = line_buffer::LineBuffer::with_capacity(255);

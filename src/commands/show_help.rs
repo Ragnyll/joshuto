@@ -12,9 +12,9 @@ use crate::ui::widgets;
 use crate::ui::widgets::TuiHelp;
 use crate::ui::AppBackend;
 
-pub fn help_loop(
+pub fn help_loop<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
     context.flush_event();

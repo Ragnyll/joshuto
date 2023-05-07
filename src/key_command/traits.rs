@@ -4,20 +4,20 @@ use crate::error::JoshutoResult;
 use crate::ui::AppBackend;
 
 pub trait AppExecute {
-    fn execute(
+    fn execute<T: AppBackend>(
         &self,
         context: &mut AppContext,
-        backend: &mut AppBackend,
+        backend: &mut T,
         keymap_t: &AppKeyMapping,
     ) -> JoshutoResult;
 }
 
 pub trait NumberedExecute {
-    fn numbered_execute(
+    fn numbered_execute<T: AppBackend>(
         &self,
         number_prefix: usize,
         context: &mut AppContext,
-        backend: &mut AppBackend,
+        backend: &mut T,
         keymap_t: &AppKeyMapping,
     ) -> JoshutoResult;
 }

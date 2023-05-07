@@ -29,7 +29,7 @@ fn find_bookmark_file() -> Option<path::PathBuf> {
     None
 }
 
-pub fn add_bookmark(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn add_bookmark<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     let cwd = std::env::current_dir()?;
 
     let bookmark_path = match search_directories(BOOKMARKS_FILE, &CONFIG_HIERARCHY) {
@@ -67,9 +67,9 @@ pub fn add_bookmark(context: &mut AppContext, backend: &mut AppBackend) -> Joshu
     Ok(())
 }
 
-pub fn change_directory_bookmark(
+pub fn change_directory_bookmark<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
 ) -> JoshutoResult {
     let key = poll_for_bookmark_key(context, backend);
 
@@ -84,7 +84,7 @@ pub fn change_directory_bookmark(
     Ok(())
 }
 
-fn poll_for_bookmark_key(context: &mut AppContext, backend: &mut AppBackend) -> Option<Event> {
+fn poll_for_bookmark_key<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> Option<Event> {
     context.flush_event();
 
     let mut bookmarks: Vec<String> = BOOKMARKS_T

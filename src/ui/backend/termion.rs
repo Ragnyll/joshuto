@@ -1,9 +1,11 @@
 use std::io::{self, stdout, Write};
 
-use termion::raw::{IntoRawMode, RawTerminal};
-use termion::screen::AlternateScreen;
-use tui::backend::TermionBackend;
-use tui::widgets::Widget;
+use super::traits::AppBackend;
+use termion::{
+    raw::{IntoRawMode, RawTerminal},
+    screen::AlternateScreen,
+};
+use tui::{backend::TermionBackend, widgets::Widget};
 
 #[cfg(feature = "mouse")]
 use termion::input::MouseTerminal;
@@ -35,15 +37,16 @@ impl New for Screen {
     }
 }
 
-// pub type TuiBackend = TermionBackend<Screen>;
-pub type TuiTerminal = tui::Terminal<TermionBackend<Screen>>;
+pub type TermionTuiTerminal = tui::Terminal<TermionBackend<Screen>>;
 
-pub struct AppBackend {
-    pub terminal: Option<TuiTerminal>,
+pub struct TermionAppBackend {
+    pub terminal: Option<TermionTuiTerminal>,
 }
 
-impl AppBackend {
-    pub fn new() -> io::Result<Self> {
+impl AppBackend for TermionAppBackend {
+    type TuiTerminal = TermionTuiTerminal;
+
+    fn new() -> io::Result<Self> {
         let mut alt_screen = Screen::new()?;
         // clears the screen of artifacts
         write!(alt_screen, "{}", termion::clear::All)?;
@@ -56,7 +59,7 @@ impl AppBackend {
         })
     }
 
-    pub fn render<W>(&mut self, widget: W)
+    fn render<W>(&mut self, widget: W)
     where
         W: Widget,
     {
@@ -66,20 +69,24 @@ impl AppBackend {
         });
     }
 
-    pub fn terminal_ref(&self) -> &TuiTerminal {
+    fn terminal(&self) -> Option<Self::TuiTerminal> {
+        self.terminal
+    }
+
+    fn terminal_ref(&self) -> &Self::TuiTerminal {
         self.terminal.as_ref().unwrap()
     }
 
-    pub fn terminal_mut(&mut self) -> &mut TuiTerminal {
+    fn terminal_mut(&mut self) -> &mut Self::TuiTerminal {
         self.terminal.as_mut().unwrap()
     }
 
-    pub fn terminal_drop(&mut self) {
+    fn terminal_drop(&mut self) {
         let _ = self.terminal.take();
         let _ = stdout().flush();
     }
 
-    pub fn terminal_restore(&mut self) -> io::Result<()> {
+    fn terminal_restore(&mut self) -> io::Result<()> {
         let mut new_backend = Self::new()?;
         std::mem::swap(&mut self.terminal, &mut new_backend.terminal);
         Ok(())

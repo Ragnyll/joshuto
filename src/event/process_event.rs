@@ -21,8 +21,8 @@ use crate::ui;
 use crate::ui::views::TuiCommandMenu;
 use crate::util::format;
 
-pub fn poll_event_until_simple_keybind<'a>(
-    backend: &mut ui::AppBackend,
+pub fn poll_event_until_simple_keybind<'a, T: ui::AppBackend>(
+    backend: &mut T,
     context: &mut AppContext,
     keymap: &'a KeyMapping,
 ) -> Option<&'a Command> {
@@ -203,9 +203,9 @@ pub fn process_file_preview(
     }
 }
 
-pub fn process_unsupported(
+pub fn process_unsupported<T: ui::AppBackend>(
     context: &mut AppContext,
-    backend: &mut ui::AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
     event: Vec<u8>,
 ) {
@@ -247,13 +247,13 @@ fn children_cursor_move(context: &mut AppContext, new_index: usize) {
     }
 }
 
-pub fn process_mouse(
+pub fn process_mouse<T: ui::AppBackend>(
     event: MouseEvent,
     context: &mut AppContext,
-    backend: &mut ui::AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) {
-    let f_size = backend.terminal.as_ref().unwrap().size().unwrap();
+    let f_size = backend.terminal().as_ref().unwrap().size().unwrap();
 
     let constraints: &[Constraint; 3] = &context.config_ref().display_options_ref().default_layout;
     let vertical_margin = if context.config_ref().display_options_ref().show_borders() {

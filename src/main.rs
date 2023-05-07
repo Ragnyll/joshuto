@@ -21,6 +21,7 @@ use std::path::PathBuf;
 use std::process;
 use std::sync::Mutex;
 use structopt::StructOpt;
+use ui::AppBackend;
 
 use crate::commands::quit::QuitAction;
 use crate::config::{
@@ -118,7 +119,7 @@ fn run_main(args: Args) -> Result<i32, JoshutoError> {
 
     let mut context = AppContext::new(config, args.clone());
     {
-        let mut backend: ui::AppBackend = ui::AppBackend::new()?;
+        let mut backend: ui::TermionAppBackend = ui::TermionAppBackend::new()?;
         run::run_loop(&mut backend, &mut context, keymap)?;
     }
     run_quit(&args, &context)?;
