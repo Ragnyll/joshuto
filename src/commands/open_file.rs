@@ -212,7 +212,10 @@ pub fn open_with_index<T: AppBackend>(
     Ok(())
 }
 
-pub fn open_with_interactive<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
+pub fn open_with_interactive<T: AppBackend>(
+    context: &mut AppContext,
+    backend: &mut T,
+) -> JoshutoResult {
     let mut paths = context
         .tab_context_ref()
         .curr_tab_ref()

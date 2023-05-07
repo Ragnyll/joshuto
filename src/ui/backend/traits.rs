@@ -1,23 +1,21 @@
 use std::io;
-use tui::{
-    terminal::Terminal,
-    backend::Backend,
-    widgets::Widget,
-};
+use tui::{backend::Backend, terminal::Terminal, widgets::Widget};
 
 /// Trait used for terminal backends (termion, crossterm, etc.) to interact with Joshuto
 pub trait AppBackend {
     type TuiTerminal: Backend;
 
     /// Build a new AppBackend
-    fn new() -> io::Result<Self> where Self: Sized;
+    fn new() -> io::Result<Self>
+    where
+        Self: Sized;
 
     /// Terminal backends must be able to register widgets
     fn render<W>(&mut self, widget: W)
     where
         W: Widget;
 
-    fn terminal(&self) ->  &Option<Terminal<Self::TuiTerminal>>;
+    fn terminal(&self) -> &Option<Terminal<Self::TuiTerminal>>;
 
     /// AppBackends must be able to return a ref to its inner backend object
     fn terminal_ref(&self) -> &Terminal<Self::TuiTerminal>;

@@ -84,7 +84,10 @@ pub fn change_directory_bookmark<T: AppBackend>(
     Ok(())
 }
 
-fn poll_for_bookmark_key<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> Option<Event> {
+fn poll_for_bookmark_key<T: AppBackend>(
+    context: &mut AppContext,
+    backend: &mut T,
+) -> Option<Event> {
     context.flush_event();
 
     let mut bookmarks: Vec<String> = BOOKMARKS_T

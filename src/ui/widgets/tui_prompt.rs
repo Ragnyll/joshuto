@@ -7,8 +7,8 @@ use tui::widgets::{Clear, Paragraph, Wrap};
 use crate::context::AppContext;
 use crate::event::process_event;
 use crate::event::AppEvent;
-use crate::ui::views::TuiView;
 use crate::ui::backend::traits::AppBackend;
+use crate::ui::views::TuiView;
 
 pub struct TuiPrompt<'a> {
     prompt: &'a str,
