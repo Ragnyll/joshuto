@@ -14,7 +14,7 @@ ansi-to-tui = { version = "^3", optional = true }
 alphanumeric-sort = "^1"
 chrono = "^0"
 colors-transform = "^0"
-crossterm = "0.26"
+crossterm = {version = "0.26", optional = true }
 dirs-next = "^2"
 filetime = "^0"
 globset = "^0"
@@ -51,9 +51,11 @@ features = [
 ]
 
 [features]
+crossterm-backend = ["crossterm"]
+default = [ "devicons", "recycle_bin", "syntax_highlight" ]
+#default = [ "devicons", "recycle_bin", "syntax_highlight", "crossterm-backend" ]
 devicons = [ "phf" ]
 file_mimetype = []
 mouse = []
 recycle_bin = [ "trash" ]
 syntax_highlight = [ "ansi-to-tui" ]
-default = [ "devicons", "recycle_bin", "syntax_highlight" ]
