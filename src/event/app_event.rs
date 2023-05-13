@@ -4,13 +4,14 @@ use signal_hook::{
     iterator::{exfiltrator::SignalOnly, SignalsInfo},
 };
 use std::{io, path, sync::mpsc, thread};
-use termion::{event::Event, input::TermRead};
+use termion::input::TermRead;
+use crossterm::event::Event;
 use uuid::Uuid;
 
 #[derive(Debug)]
 pub enum AppEvent {
     // User input events
-    Termion(Event),
+    Crossterm(Event),
 
     // background IO worker events
     IoWorkerCreate,
@@ -44,7 +45,7 @@ pub struct Config {}
 pub struct Events {
     pub event_tx: mpsc::Sender<AppEvent>,
     event_rx: mpsc::Receiver<AppEvent>,
-    pub input_tx: mpsc::SyncSender<()>,
+    //pub input_tx: mpsc::SyncSender<()>,
 }
 
 impl Events {
@@ -61,17 +62,21 @@ impl Events {
     }
 
     pub fn flush(&self) {
-        let _ = self.input_tx.send(());
+        //let _ = self.input_tx.send(());
     }
 }
 
 impl std::default::Default for Events {
     fn default() -> Self {
-        let (input_tx, input_rx) = mpsc::sync_channel(1);
+        // i dont think i need the original events. Termion requires channels to receive the events,
+        // but crossterm can do that on its own.
+        //let (input_tx, input_rx) = mpsc::sync_channel(1);
+        // NOTE: The event_tx, rx i might though. I think that handles something different
+        // I think the event_tx and rd
         let (event_tx, event_rx) = mpsc::channel();
 
         // edge case that starts off the input thread
-        let _ = input_tx.send(());
+        //let _ = input_tx.send(());
 
         // signal thread
         let event_tx2 = event_tx.clone();
@@ -92,17 +97,18 @@ impl std::default::Default for Events {
             let stdin = io::stdin();
             let mut events = stdin.events();
 
-            while input_rx.recv().is_ok() {
-                if let Some(Ok(event)) = events.next() {
-                    let _ = event_tx2.send(AppEvent::Termion(event));
-                }
-            }
+            // TODO: come back to this for crossterm
+            //while input_rx.recv().is_ok() {
+                //if let Some(Ok(event)) = events.next() {
+                    //let _ = event_tx2.send(AppEvent::Crossterm(event));
+                //}
+            //}
         });
 
         Events {
             event_tx,
             event_rx,
-            input_tx,
+            //input_tx,
         }
     }
 }
