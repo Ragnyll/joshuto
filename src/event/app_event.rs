@@ -1,20 +1,11 @@
-use std::io;
-use std::path;
-use std::sync::mpsc;
-use std::thread;
-
-use signal_hook::consts::signal;
-use signal_hook::iterator::exfiltrator::SignalOnly;
-use signal_hook::iterator::SignalsInfo;
-
-use termion::event::Event;
-use termion::input::TermRead;
-
+use crate::{fs::JoshutoDirList, io::FileOperationProgress, preview::preview_file::FilePreview};
+use signal_hook::{
+    consts::signal,
+    iterator::{exfiltrator::SignalOnly, SignalsInfo},
+};
+use std::{io, path, sync::mpsc, thread};
+use termion::{event::Event, input::TermRead};
 use uuid::Uuid;
-
-use crate::fs::JoshutoDirList;
-use crate::io::FileOperationProgress;
-use crate::preview::preview_file::FilePreview;
 
 #[derive(Debug)]
 pub enum AppEvent {
