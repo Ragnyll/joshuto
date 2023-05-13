@@ -119,8 +119,8 @@ fn run_main(args: Args) -> Result<i32, JoshutoError> {
 
     let mut context = AppContext::new(config, args.clone());
     {
-        let mut backend = ui::TermionAppBackend::new()?;
-        //let mut backend = ui::CrosstermAppBackend::new()?;
+        //let mut backend = ui::TermionAppBackend::new()?;
+        let mut backend = ui::CrosstermAppBackend::new()?;
         run::run_loop(&mut backend, &mut context, keymap)?;
     }
     run_quit(&args, &context)?;
