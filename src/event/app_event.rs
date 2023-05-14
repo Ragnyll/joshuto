@@ -1,11 +1,10 @@
 use crate::{fs::JoshutoDirList, io::FileOperationProgress, preview::preview_file::FilePreview};
+use crossterm::event::{poll, read, Event};
 use signal_hook::{
     consts::signal,
     iterator::{exfiltrator::SignalOnly, SignalsInfo},
 };
-use std::{io, path, sync::mpsc, thread};
-use termion::input::TermRead;
-use crossterm::event::Event;
+use std::{io, path, sync::mpsc, thread, time::Duration};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -68,15 +67,7 @@ impl Events {
 
 impl std::default::Default for Events {
     fn default() -> Self {
-        // i dont think i need the original events. Termion requires channels to receive the events,
-        // but crossterm can do that on its own.
-        //let (input_tx, input_rx) = mpsc::sync_channel(1);
-        // NOTE: The event_tx, rx i might though. I think that handles something different
-        // I think the event_tx and rd
         let (event_tx, event_rx) = mpsc::channel();
-
-        // edge case that starts off the input thread
-        //let _ = input_tx.send(());
 
         // signal thread
         let event_tx2 = event_tx.clone();
@@ -94,21 +85,16 @@ impl std::default::Default for Events {
         // input thread
         let event_tx2 = event_tx.clone();
         let _ = thread::spawn(move || {
-            let stdin = io::stdin();
-            let mut events = stdin.events();
-
-            // TODO: come back to this for crossterm
-            //while input_rx.recv().is_ok() {
-                //if let Some(Ok(event)) = events.next() {
-                    //let _ = event_tx2.send(AppEvent::Crossterm(event));
-                //}
-            //}
+            // check for events ever .1 seconds. This should probably be even lower. Ask
+            // maintainers if there is a better way.
+            // should probably find a better way than unwrap
+            if poll(Duration::from_millis(100)).unwrap() {
+                if let Ok(event) = read() {
+                    let _ = event_tx2.send(AppEvent::Crossterm(event));
+                }
+            }
         });
 
-        Events {
-            event_tx,
-            event_rx,
-            //input_tx,
-        }
+        Events { event_tx, event_rx }
     }
 }
