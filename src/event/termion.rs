@@ -1,4 +1,3 @@
-use super::JoshutoEvent;
 use crate::{fs::JoshutoDirList, io::FileOperationProgress, preview::preview_file::FilePreview};
 use signal_hook::{
     consts::signal,
