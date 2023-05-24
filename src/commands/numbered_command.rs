@@ -1,4 +1,4 @@
-use termion::event::{Event, Key};
+use crossterm::event::{Event, KeyCode};
 
 use crate::commands::cursor_move;
 use crate::config::AppKeyMapping;
@@ -41,28 +41,37 @@ pub fn numbered_command<T: AppBackend>(
         };
 
         match event {
-            AppEvent::Termion(event) => {
-                match event {
-                    Event::Key(Key::Esc) => return Ok(()),
-                    Event::Key(Key::Char('g')) => {
-                        cursor_move::cursor_move(context, num_prefix - 1);
-                        return Ok(());
-                    }
-                    Event::Key(Key::Char(c)) if c.is_numeric() => {
-                        prefix.push(c);
-                    }
-                    key => match keymap.default_view.get(&key) {
-                        Some(CommandKeybind::SimpleKeybind(command)) => {
-                            return command.numbered_execute(num_prefix, context, backend, keymap);
+            AppEvent::Crossterm(event) => {
+                if let Event::Key(keyevent) = event {
+                    match keyevent.code {
+                        KeyCode::Esc => return Ok(()),
+                        KeyCode::Char('g') => {
+                            cursor_move::cursor_move(context, num_prefix - 1);
+                            return Ok(());
+                        }
+                        KeyCode::Char(c) if c.is_numeric() => {
+                            prefix.push(c);
                         }
                         _ => {
-                            return Err(JoshutoError::new(
-                                JoshutoErrorKind::UnrecognizedCommand,
-                                "Command cannot be prefixed by a number or does not exist"
-                                    .to_string(),
-                            ));
+                            todo!("numbered_command aint all there");
                         }
-                    },
+                        // TODO: i'm not exactly sure what this does. com back to it.
+                        //key => match keymap.default_view.get(&key) {
+                            //Some(CommandKeybind::SimpleKeybind(command)) => {
+                                //return command
+                                    //.numbered_execute(num_prefix, context, backend, keymap);
+                            //}
+                            //_ => {
+                                //return Err(JoshutoError::new(
+                                    //JoshutoErrorKind::UnrecognizedCommand,
+                                    //"Command cannot be prefixed by a number or does not exist"
+                                        //.to_string(),
+                                //));
+                            //}
+                        //},
+                    }
+                } else {
+                    panic!("Im not sure how we got here.")
                 }
                 context.flush_event();
             }

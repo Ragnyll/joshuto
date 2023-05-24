@@ -1,34 +1,34 @@
-use termion::event::{Event, Key, MouseEvent};
+use crossterm::event::{Event, KeyCode, KeyEvent, MouseEventKind};
 
 pub trait ToString {
     fn to_string(&self) -> String;
 }
 
-impl ToString for Key {
+impl ToString for KeyEvent {
     fn to_string(&self) -> String {
-        match *self {
-            Key::Char(c) => format!("{}", c),
-            Key::Ctrl(c) => format!("ctrl+{}", c),
-            Key::Left => "arrow_left".to_string(),
-            Key::Right => "arrow_right".to_string(),
-            Key::Up => "arrow_up".to_string(),
-            Key::Down => "arrow_down".to_string(),
-            Key::Backspace => "backspace".to_string(),
-            Key::Home => "home".to_string(),
-            Key::End => "end".to_string(),
-            Key::PageUp => "page_up".to_string(),
-            Key::PageDown => "page_down".to_string(),
-            Key::BackTab => "backtab".to_string(),
-            Key::Insert => "insert".to_string(),
-            Key::Delete => "delete".to_string(),
-            Key::Esc => "escape".to_string(),
-            Key::F(i) => format!("f{}", i),
+        match self.code {
+            KeyCode::Char(c) => format!("{}", c),
+            //KeyCode::Ctrl(c) => format!("ctrl+{}", c),
+            KeyCode::Left => "arrow_left".to_string(),
+            KeyCode::Right => "arrow_right".to_string(),
+            KeyCode::Up => "arrow_up".to_string(),
+            KeyCode::Down => "arrow_down".to_string(),
+            KeyCode::Backspace => "backspace".to_string(),
+            KeyCode::Home => "home".to_string(),
+            KeyCode::End => "end".to_string(),
+            KeyCode::PageUp => "page_up".to_string(),
+            KeyCode::PageDown => "page_down".to_string(),
+            KeyCode::BackTab => "backtab".to_string(),
+            KeyCode::Insert => "insert".to_string(),
+            KeyCode::Delete => "delete".to_string(),
+            KeyCode::Esc => "escape".to_string(),
+            KeyCode::F(i) => format!("f{}", i),
             k => format!("{:?}", k),
         }
     }
 }
 
-impl ToString for MouseEvent {
+impl ToString for MouseEventKind {
     fn to_string(&self) -> String {
         let k = *self;
         format!("{:?}", k)
@@ -39,8 +39,10 @@ impl ToString for Event {
     fn to_string(&self) -> String {
         match self {
             Event::Key(key) => key.to_string(),
-            Event::Mouse(mouse) => mouse.to_string(),
-            Event::Unsupported(v) => format!("{:?}", v),
+            Event::Mouse(mouse) => todo!("ToString For mouse event"),
+            _ => todo!("ToString for other event")
+            //Event::Mouse(mouse) => mouse.to_string(),
+            //Event::Unsupported(v) => format!("{:?}", v),
         }
     }
 }

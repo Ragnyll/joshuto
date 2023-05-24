@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 use crate::config::AppKeyMapping;
 use crate::context::AppContext;
 use crate::error::JoshutoResult;
@@ -8,45 +9,46 @@ use crate::traits::ToString;
 use crate::ui::views::TuiWorkerView;
 use crate::ui::AppBackend;
 
+// TODO: add back
 pub fn show_tasks<T: AppBackend>(
     context: &mut AppContext,
     backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
-    context.flush_event();
+/*    context.flush_event();*/
 
-    loop {
-        backend.render(TuiWorkerView::new(context));
+    /*loop {*/
+        /*backend.render(TuiWorkerView::new(context));*/
 
-        if let Ok(event) = context.poll_event() {
-            match event {
-                AppEvent::Termion(key) => {
-                    let key = key;
-                    match keymap_t.task_view.get(&key) {
-                        None => {
-                            context
-                                .message_queue_mut()
-                                .push_info(format!("Unmapped input: {}", key.to_string()));
-                        }
-                        Some(CommandKeybind::SimpleKeybind(command)) => {
-                            if let Command::ShowTasks = command {
-                                break;
-                            }
-                        }
-                        Some(CommandKeybind::CompositeKeybind(m)) => {
-                            let cmd =
-                                process_event::poll_event_until_simple_keybind(backend, context, m);
+        /*if let Ok(event) = context.poll_event() {*/
+            /*match event {*/
+                /*AppEvent::Crossterm(key) => {*/
+                    /*let key = key;*/
+                    /*match keymap_t.task_view.get(&key) {*/
+                        /*None => {*/
+                            /*context*/
+                                /*.message_queue_mut()*/
+                                /*.push_info(format!("Unmapped input: {}", key.to_string()));*/
+                        /*}*/
+                        /*Some(CommandKeybind::SimpleKeybind(command)) => {*/
+                            /*if let Command::ShowTasks = command {*/
+                                /*break;*/
+                            /*}*/
+                        /*}*/
+                        /*Some(CommandKeybind::CompositeKeybind(m)) => {*/
+                            /*let cmd =*/
+                                /*process_event::poll_event_until_simple_keybind(backend, context, m);*/
 
-                            if let Some(Command::ShowTasks) = cmd {
-                                break;
-                            }
-                        }
-                    }
-                    context.flush_event();
-                }
-                event => process_event::process_noninteractive(event, context),
-            };
-        }
-    }
+                            /*if let Some(Command::ShowTasks) = cmd {*/
+                                /*break;*/
+                            /*}*/
+                        /*}*/
+                    /*}*/
+                    /*context.flush_event();*/
+                /*}*/
+                /*event => process_event::process_noninteractive(event, context),*/
+            /*};*/
+        /*}*/
+    /*}*/
     Ok(())
 }

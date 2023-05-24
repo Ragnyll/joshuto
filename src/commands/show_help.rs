@@ -1,6 +1,7 @@
+#![allow(unused_imports)]
 use std::cmp::Ordering;
 
-use termion::event::{Event, Key};
+use crossterm::event::{Event, KeyCode};
 
 use crate::config::AppKeyMapping;
 use crate::context::AppContext;
@@ -17,68 +18,69 @@ pub fn help_loop<T: AppBackend>(
     backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
-    context.flush_event();
+    // come back and add help back
+/*    context.flush_event();*/
 
-    let mut offset = 0;
-    let mut search_query = String::new();
-    let mut sort_by = 1;
+    /*let mut offset = 0;*/
+    /*let mut search_query = String::new();*/
+    /*let mut sort_by = 1;*/
 
-    loop {
-        let keymap = if search_query.is_empty() {
-            widgets::get_keymap_table(&keymap_t.default_view, &search_query, sort_by)
-        } else {
-            widgets::get_keymap_table(&keymap_t.default_view, &search_query[1..], sort_by)
-        };
+    /*loop {*/
+        /*let keymap = if search_query.is_empty() {*/
+            /*widgets::get_keymap_table(&keymap_t.default_view, &search_query, sort_by)*/
+        /*} else {*/
+            /*widgets::get_keymap_table(&keymap_t.default_view, &search_query[1..], sort_by)*/
+        /*};*/
 
-        context.remove_external_preview();
-        backend.render(TuiHelp::new(&keymap, &mut offset, &search_query));
+        /*context.remove_external_preview();*/
+        /*backend.render(TuiHelp::new(&keymap, &mut offset, &search_query));*/
 
-        let event = match context.poll_event() {
-            Ok(event) => event,
-            Err(_) => return Ok(()),
-        };
+        /*let event = match context.poll_event() {*/
+            /*Ok(event) => event,*/
+            /*Err(_) => return Ok(()),*/
+        /*};*/
 
-        match event {
-            AppEvent::Termion(event) => {
-                if search_query.is_empty() {
-                    match event {
-                        Event::Key(Key::Esc) => break,
-                        Event::Key(Key::Char('1')) => sort_by = 0,
-                        Event::Key(Key::Char('2')) => sort_by = 1,
-                        Event::Key(Key::Char('3')) => sort_by = 2,
-                        Event::Key(Key::Char('/')) => search_query.push('/'),
-                        event => {
-                            if let Some(CommandKeybind::SimpleKeybind(command)) =
-                                keymap_t.help_view.get(&event)
-                            {
-                                match command {
-                                    Command::CursorMoveUp { .. } => move_offset(&mut offset, -1),
-                                    Command::CursorMoveDown { .. } => move_offset(&mut offset, 1),
-                                    Command::CursorMoveHome => offset = 0,
-                                    Command::CursorMoveEnd => offset = 255,
-                                    Command::CursorMovePageUp(_) => move_offset(&mut offset, -10),
-                                    Command::CursorMovePageDown(_) => move_offset(&mut offset, 10),
-                                    Command::CloseTab | Command::Help => break,
-                                    _ => (),
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    match event {
-                        Event::Key(Key::Esc) => search_query.clear(),
-                        Event::Key(Key::Backspace) => {
-                            search_query.pop();
-                        }
-                        Event::Key(Key::Char(chr)) => search_query.push(chr),
-                        _ => (),
-                    }
-                }
-                context.flush_event();
-            }
-            _ => process_event::process_noninteractive(event, context),
-        }
-    }
+        /*match event {*/
+            /*AppEvent::Crossterm(event) => {*/
+                /*if search_query.is_empty() {*/
+                    /*match event {*/
+                        /*Event::Key(KeyCode::Esc) => break,*/
+                        /*Event::Key(Key::Char('1')) => sort_by = 0,*/
+                        /*Event::Key(Key::Char('2')) => sort_by = 1,*/
+                        /*Event::Key(Key::Char('3')) => sort_by = 2,*/
+                        /*Event::Key(Key::Char('/')) => search_query.push('/'),*/
+                        /*event => {*/
+                            /*if let Some(CommandKeybind::SimpleKeybind(command)) =*/
+                                /*keymap_t.help_view.get(&event)*/
+                            /*{*/
+                                /*match command {*/
+                                    /*Command::CursorMoveUp { .. } => move_offset(&mut offset, -1),*/
+                                    /*Command::CursorMoveDown { .. } => move_offset(&mut offset, 1),*/
+                                    /*Command::CursorMoveHome => offset = 0,*/
+                                    /*Command::CursorMoveEnd => offset = 255,*/
+                                    /*Command::CursorMovePageUp(_) => move_offset(&mut offset, -10),*/
+                                    /*Command::CursorMovePageDown(_) => move_offset(&mut offset, 10),*/
+                                    /*Command::CloseTab | Command::Help => break,*/
+                                    /*_ => (),*/
+                                /*}*/
+                            /*}*/
+                        /*}*/
+                    /*}*/
+                /*} else {*/
+                    /*match event {*/
+                        /*Event::Key(Key::Esc) => search_query.clear(),*/
+                        /*Event::Key(Key::Backspace) => {*/
+                            /*search_query.pop();*/
+                        /*}*/
+                        /*Event::Key(Key::Char(chr)) => search_query.push(chr),*/
+                        /*_ => (),*/
+                    /*}*/
+                /*}*/
+                /*context.flush_event();*/
+            /*}*/
+            /*_ => process_event::process_noninteractive(event, context),*/
+        /*}*/
+    /*}*/
 
     Ok(())
 }

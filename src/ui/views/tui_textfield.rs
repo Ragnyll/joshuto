@@ -6,7 +6,8 @@ use rustyline::{
     At, Word,
 };
 
-use termion::event::{Event, Key};
+//use termion::event::{Event, Key};
+use crossterm::event::{Event, KeyCode};
 use tui::layout::Rect;
 use tui::widgets::Clear;
 use unicode_width::UnicodeWidthStr;
@@ -166,9 +167,9 @@ impl<'a> TuiTextField<'a> {
 
             if let Ok(event) = context.poll_event() {
                 match event {
-                    AppEvent::Termion(Event::Key(key)) => {
-                        let dirty = match key {
-                            Key::Backspace => {
+                    AppEvent::Crossterm(Event::Key(key)) => {
+                        let dirty = match key.code {
+                            KeyCode::Backspace => {
                                 let res = line_buffer.backspace(1);
 
                                 if let Ok(command) = Command::from_str(line_buffer.as_str()) {
@@ -176,10 +177,10 @@ impl<'a> TuiTextField<'a> {
                                 }
                                 res
                             }
-                            Key::Delete => line_buffer.delete(1).is_some(),
-                            Key::Home => line_buffer.move_home(),
-                            Key::End => line_buffer.move_end(),
-                            Key::Up => {
+                            KeyCode::Delete => line_buffer.delete(1).is_some(),
+                            KeyCode::Home => line_buffer.move_home(),
+                            KeyCode::End => line_buffer.move_end(),
+                            KeyCode::Up => {
                                 curr_history_index = curr_history_index.saturating_sub(1);
                                 line_buffer.move_home();
                                 line_buffer.kill_line();
@@ -192,7 +193,7 @@ impl<'a> TuiTextField<'a> {
                                 }
                                 true
                             }
-                            Key::Down => {
+                            KeyCode::Down => {
                                 curr_history_index = if curr_history_index
                                     < context.commandline_context_ref().history_ref().len()
                                 {
@@ -211,63 +212,64 @@ impl<'a> TuiTextField<'a> {
                                 }
                                 true
                             }
-                            Key::Esc => {
+                            KeyCode::Esc => {
                                 let _ = terminal.hide_cursor();
                                 return None;
                             }
-                            Key::Char('\t') => autocomplete(
+                            KeyCode::Char('\t') => autocomplete(
                                 &mut line_buffer,
                                 &mut completion_tracker,
                                 &completer,
                                 false,
                             ),
-                            Key::BackTab => autocomplete(
+                            KeyCode::BackTab => autocomplete(
                                 &mut line_buffer,
                                 &mut completion_tracker,
                                 &completer,
                                 true,
                             ),
 
+                            // todo: modified  key coes are different, ignore them for now
                             // Current `completion_tracker` should be dropped
                             // only if we moved to another word
-                            Key::Ctrl('a') => {
-                                moved_to_another_word(&mut line_buffer, |line_buffer| {
-                                    line_buffer.move_home()
-                                })
-                            }
-                            Key::Ctrl('e') => {
-                                moved_to_another_word(&mut line_buffer, |line_buffer| {
-                                    line_buffer.move_end()
-                                })
-                            }
-                            Key::Ctrl('f') | Key::Right => {
-                                moved_to_another_word(&mut line_buffer, |line_buffer| {
-                                    line_buffer.move_forward(1)
-                                })
-                            }
-                            Key::Ctrl('b') | Key::Left => {
-                                moved_to_another_word(&mut line_buffer, |line_buffer| {
-                                    line_buffer.move_backward(1)
-                                })
-                            }
-                            Key::Alt('f') => {
-                                moved_to_another_word(&mut line_buffer, |line_buffer| {
-                                    line_buffer.move_to_next_word(At::Start, Word::Vi, 1)
-                                })
-                            }
-                            Key::Alt('b') => {
-                                moved_to_another_word(&mut line_buffer, |line_buffer| {
-                                    line_buffer.move_to_prev_word(Word::Vi, 1)
-                                })
-                            }
+                            //KeyCode::Ctrl('a') => {
+                                //moved_to_another_word(&mut line_buffer, |line_buffer| {
+                                    //line_buffer.move_home()
+                                //})
+                            //}
+                            //KeyCode::Ctrl('e') => {
+                                //moved_to_another_word(&mut line_buffer, |line_buffer| {
+                                    //line_buffer.move_end()
+                                //})
+                            //}
+                            //KeyCode::Ctrl('f') | KeyCode::Right => {
+                                //moved_to_another_word(&mut line_buffer, |line_buffer| {
+                                    //line_buffer.move_forward(1)
+                                //})
+                            //}
+                            //KeyCode::Ctrl('b') | KeyCode::Left => {
+                                //moved_to_another_word(&mut line_buffer, |line_buffer| {
+                                    //line_buffer.move_backward(1)
+                                //})
+                            //}
+                            //KeyCode::Alt('f') => {
+                                //moved_to_another_word(&mut line_buffer, |line_buffer| {
+                                    //line_buffer.move_to_next_word(At::Start, Word::Vi, 1)
+                                //})
+                            //}
+                            //KeyCode::Alt('b') => {
+                                //moved_to_another_word(&mut line_buffer, |line_buffer| {
+                                    //line_buffer.move_to_prev_word(Word::Vi, 1)
+                                //})
+                            //}
 
-                            Key::Ctrl('w') => line_buffer.delete_prev_word(Word::Vi, 1),
-                            Key::Ctrl('u') => line_buffer.discard_line(),
-                            Key::Ctrl('d') => line_buffer.delete(1).is_some(),
-                            Key::Char('\n') => {
+                            //KeyCode::Ctrl('w') => line_buffer.delete_prev_word(Word::Vi, 1),
+                            //KeyCode::Ctrl('u') => line_buffer.discard_line(),
+                            //KeyCode::Ctrl('d') => line_buffer.delete(1).is_some(),
+                            KeyCode::Char('\n') => {
                                 break;
                             }
-                            Key::Char(c) => {
+                            KeyCode::Char(c) => {
                                 let dirty = line_buffer.insert(c, 1).is_some();
 
                                 if let Ok(command) = Command::from_str(line_buffer.as_str()) {
@@ -282,7 +284,7 @@ impl<'a> TuiTextField<'a> {
                         }
                         context.flush_event();
                     }
-                    AppEvent::Termion(_) => {
+                    AppEvent::Crossterm(_) => {
                         context.flush_event();
                     }
                     event => process_event::process_noninteractive(event, context),

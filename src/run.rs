@@ -13,7 +13,7 @@ use crate::ui::views::TuiView;
 
 use uuid::Uuid;
 
-use termion::event::Event;
+use crossterm::event::Event;
 use tui::layout::Rect;
 
 pub fn run_loop<T: ui::AppBackend>(
@@ -63,20 +63,22 @@ pub fn run_loop<T: ui::AppBackend>(
 
         // handle the event
         match event {
-            AppEvent::Termion(Event::Mouse(event)) => {
-                process_event::process_mouse(event, context, backend, &keymap_t);
+
+            AppEvent::Crossterm(Event::Mouse(event)) => {
+                todo!("mouse stuff not implemented yet");
+                //process_event::process_mouse(event, context, backend, &keymap_t);
                 preview_default::load_preview(context, backend);
             }
-            AppEvent::Termion(key) => {
+            AppEvent::Crossterm(key) => {
                 if context.message_queue_ref().current_message().is_some() {
                     context.message_queue_mut().pop_front();
                 }
                 match key {
                     // in the event where mouse input is not supported
                     // but we still want to register scroll
-                    Event::Unsupported(s) => {
-                        process_event::process_unsupported(context, backend, &keymap_t, s);
-                    }
+                    //Event::Unsupported(s) => {
+                        //process_event::process_unsupported(context, backend, &keymap_t, s);
+                    //}
                     key => match keymap_t.default_view.get(&key) {
                         None => {
                             context

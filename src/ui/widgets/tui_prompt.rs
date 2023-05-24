@@ -1,4 +1,4 @@
-use termion::event::{Event, Key};
+use crossterm::event::{Event, KeyCode};
 use tui::layout::Rect;
 use tui::style::{Color, Style};
 use tui::text::Span;
@@ -19,7 +19,7 @@ impl<'a> TuiPrompt<'a> {
         Self { prompt }
     }
 
-    pub fn get_key<T: AppBackend>(&mut self, backend: &mut T, context: &mut AppContext) -> Key {
+    pub fn get_key<T: AppBackend>(&mut self, backend: &mut T, context: &mut AppContext) -> KeyCode {
         let terminal = backend.terminal_mut();
 
         context.flush_event();
@@ -56,10 +56,10 @@ impl<'a> TuiPrompt<'a> {
 
             if let Ok(event) = context.poll_event() {
                 match event {
-                    AppEvent::Termion(Event::Key(key)) => {
-                        return key;
+                    AppEvent::Crossterm(Event::Key(key)) => {
+                        return key.code;
                     }
-                    AppEvent::Termion(_) => {
+                    AppEvent::Crossterm(_) => {
                         context.flush_event();
                     }
                     event => process_event::process_noninteractive(event, context),

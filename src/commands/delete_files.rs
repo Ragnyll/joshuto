@@ -1,7 +1,7 @@
 use std::path;
 use std::sync::mpsc;
 
-use termion::event::Key;
+use crossterm::event::KeyCode;
 
 use crate::context::AppContext;
 use crate::error::JoshutoResult;
@@ -37,7 +37,7 @@ fn delete_files<T: AppBackend>(
     };
 
     match ch {
-        Key::Char('Y') | Key::Char('y') | Key::Char('\n') => {
+        KeyCode::Char('Y') | KeyCode::Char('y') | KeyCode::Char('\n') => {
             let confirm_delete = if paths_len > 1 {
                 // prompt user again for deleting multiple files
                 let ch = {
@@ -45,7 +45,7 @@ fn delete_files<T: AppBackend>(
                     let mut prompt = TuiPrompt::new(prompt_str);
                     prompt.get_key(backend, context)
                 };
-                ch == Key::Char('y')
+                ch == KeyCode::Char('y')
             } else {
                 true
             };
