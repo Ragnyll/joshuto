@@ -35,7 +35,7 @@ pub fn poll_event_until_simple_keybind<'a, T: ui::AppBackend>(
 
         if let Ok(event) = context.poll_event() {
             match event {
-                AppEvent::Termion(event) => {
+                AppEvent::Backend(event) => {
                     match event {
                         Event::Key(Key::Esc) => return None,
                         event => match keymap.get(&event) {
@@ -56,6 +56,7 @@ pub fn poll_event_until_simple_keybind<'a, T: ui::AppBackend>(
     }
 }
 
+/// TODO: This needs some documentation
 pub fn process_noninteractive(event: AppEvent, context: &mut AppContext) {
     match event {
         AppEvent::IoWorkerCreate => process_new_worker(context),

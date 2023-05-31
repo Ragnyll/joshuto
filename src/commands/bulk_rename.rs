@@ -18,6 +18,7 @@ const ENV_EDITOR: &str = "EDITOR";
 const FILE_PREFIX: &str = "joshuto-";
 const RAND_STR_LEN: usize = 10;
 
+/// TODO: i REALLY dont like this _ prefix. its not idiomatic with the clippy lint
 pub fn _bulk_rename(context: &mut AppContext) -> JoshutoResult {
     let tmp_directory = env::var(ENV_TMP_DIR).unwrap_or_else(|_| "/tmp".to_string());
 

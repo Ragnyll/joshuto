@@ -20,7 +20,7 @@ pub fn show_tasks<T: AppBackend>(
 
         if let Ok(event) = context.poll_event() {
             match event {
-                AppEvent::Termion(key) => {
+                AppEvent::Backend(key) => {
                     let key = key;
                     match keymap_t.task_view.get(&key) {
                         None => {

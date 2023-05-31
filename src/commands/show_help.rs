@@ -39,7 +39,7 @@ pub fn help_loop<T: AppBackend>(
         };
 
         match event {
-            AppEvent::Termion(event) => {
+            AppEvent::Backend(event) => {
                 if search_query.is_empty() {
                     match event {
                         Event::Key(Key::Esc) => break,

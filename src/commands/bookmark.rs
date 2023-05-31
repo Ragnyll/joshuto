@@ -133,7 +133,7 @@ fn poll_for_bookmark_key<T: AppBackend>(
 
         if let Ok(event) = context.poll_event() {
             match event {
-                AppEvent::Termion(key) => return Some(key),
+                AppEvent::Backend(key) => return Some(key),
                 event => process_event::process_noninteractive(event, context),
             };
         }

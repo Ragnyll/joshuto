@@ -56,10 +56,10 @@ impl<'a> TuiPrompt<'a> {
 
             if let Ok(event) = context.poll_event() {
                 match event {
-                    AppEvent::Termion(Event::Key(key)) => {
+                    AppEvent::Backend(Event::Key(key)) => {
                         return key;
                     }
-                    AppEvent::Termion(_) => {
+                    AppEvent::Backend(_) => {
                         context.flush_event();
                     }
                     event => process_event::process_noninteractive(event, context),

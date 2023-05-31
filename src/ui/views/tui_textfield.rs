@@ -166,7 +166,7 @@ impl<'a> TuiTextField<'a> {
 
             if let Ok(event) = context.poll_event() {
                 match event {
-                    AppEvent::Termion(Event::Key(key)) => {
+                    AppEvent::Backend(Event::Key(key)) => {
                         let dirty = match key {
                             Key::Backspace => {
                                 let res = line_buffer.backspace(1);
@@ -282,7 +282,7 @@ impl<'a> TuiTextField<'a> {
                         }
                         context.flush_event();
                     }
-                    AppEvent::Termion(_) => {
+                    AppEvent::Backend(_) => {
                         context.flush_event();
                     }
                     event => process_event::process_noninteractive(event, context),

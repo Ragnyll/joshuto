@@ -12,14 +12,18 @@ use termion::input::TermRead;
 
 use uuid::Uuid;
 
-use crate::fs::JoshutoDirList;
-use crate::io::FileOperationProgress;
-use crate::preview::preview_file::FilePreview;
+use crate::{
+    event::joshuto_event::JoshutoEvent, fs::JoshutoDirList, io::FileOperationProgress,
+    preview::preview_file::FilePreview,
+};
 
 #[derive(Debug)]
 pub enum AppEvent {
+    /// User input events
+    JoshutoBackend(JoshutoEvent),
+
     // User input events
-    Termion(Event),
+    Backend(Event),
 
     // background IO worker events
     IoWorkerCreate,
@@ -103,7 +107,7 @@ impl std::default::Default for Events {
 
             while input_rx.recv().is_ok() {
                 if let Some(Ok(event)) = events.next() {
-                    let _ = event_tx2.send(AppEvent::Termion(event));
+                    let _ = event_tx2.send(AppEvent::Backend(event));
                 }
             }
         });

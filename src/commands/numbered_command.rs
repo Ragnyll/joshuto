@@ -41,7 +41,7 @@ pub fn numbered_command<T: AppBackend>(
         };
 
         match event {
-            AppEvent::Termion(event) => {
+            AppEvent::Backend(event) => {
                 match event {
                     Event::Key(Key::Esc) => return Ok(()),
                     Event::Key(Key::Char('g')) => {

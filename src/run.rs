@@ -63,11 +63,11 @@ pub fn run_loop<T: ui::AppBackend>(
 
         // handle the event
         match event {
-            AppEvent::Termion(Event::Mouse(event)) => {
+            AppEvent::Backend(Event::Mouse(event)) => {
                 process_event::process_mouse(event, context, backend, &keymap_t);
                 preview_default::load_preview(context, backend);
             }
-            AppEvent::Termion(key) => {
+            AppEvent::Backend(key) => {
                 if context.message_queue_ref().current_message().is_some() {
                     context.message_queue_mut().pop_front();
                 }
