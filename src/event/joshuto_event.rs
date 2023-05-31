@@ -8,7 +8,7 @@ pub enum JoshutoEvent {
     /// A key press.
     Key(JoshutoKey),
     /// A mouse button press, release or wheel use at specific coordinates.
-    Mouse(JoshutMouseEvent),
+    Mouse(JoshutoMouseEvent),
     /// An event that cannot currently be evaluated.
     Unsupported(Vec<u8>),
 }
@@ -88,7 +88,7 @@ impl ToString for JoshutoKey {
 }
 
 #[derive(Debug)]
-pub enum JoshutMouseEvent {
+pub enum JoshutoMouseEvent {
     /// A mouse button was pressed.
     ///
     /// The coordinates are one-based.
@@ -128,7 +128,7 @@ pub enum JoshutoMouseButton {
     WheelDown,
 }
 
-impl ToString for JoshutMouseEvent {
+impl ToString for JoshutoMouseEvent {
     fn to_string(&self) -> String {
         let k = self;
         format!("{:?}", k)
