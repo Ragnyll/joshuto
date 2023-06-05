@@ -1,6 +1,9 @@
-use super::joshuto_event::{JoshutoEvent, JoshutoKey};
+use super::joshuto_event::{JoshutoEvent, JoshutoKey, JoshutoMouseButton, JoshutoMouseEvent};
 use std::convert::From;
-use termion::event::{Event as TermionEvent, Key as TermionKey, MouseEvent as TermionMouseEvent};
+use termion::event::{
+    Event as TermionEvent, Key as TermionKey, MouseButton as TermionMouseButton,
+    MouseEvent as TermionMouseEvent,
+};
 
 impl From<TermionEvent> for JoshutoEvent {
     fn from(event: TermionEvent) -> Self {
@@ -18,7 +21,9 @@ impl From<TermionEvent> for JoshutoEvent {
                 TermionKey::BackTab => JoshutoEvent::Key(JoshutoKey::BackTab),
                 TermionKey::Delete => JoshutoEvent::Key(JoshutoKey::Delete),
                 TermionKey::Insert => JoshutoEvent::Key(JoshutoKey::Insert),
-                TermionKey::F(function_key_number) => JoshutoEvent::Key(JoshutoKey::F(function_key_number)),
+                TermionKey::F(function_key_number) => {
+                    JoshutoEvent::Key(JoshutoKey::F(function_key_number))
+                }
                 TermionKey::Char(char) => JoshutoEvent::Key(JoshutoKey::Char(char)),
                 TermionKey::Alt(char) => JoshutoEvent::Key(JoshutoKey::Alt(char)),
                 TermionKey::Ctrl(char) => JoshutoEvent::Key(JoshutoKey::Ctrl(char)),
@@ -27,22 +32,28 @@ impl From<TermionEvent> for JoshutoEvent {
                 // kinda sus
                 _ => JoshutoEvent::Unsupported(vec![0_u8]),
             },
-            TermionEvent::Mouse(mouse_event) => {
-                match mouse_event {
-                    TermionMouseEvent::Press(mouse_button, x, y) => {
-                        todo!("Impl mouse event press")
-                    },
-                    TermionMouseEvent::Release(x, y) => {
-                        todo!("Impl mouse_event_release")
-                    },
-                    TermionMouseEvent::Hold(x, y) => {
-                        todo!("impl mouse_event hold")
-                    },
+            TermionEvent::Mouse(mouse_event) => match mouse_event {
+                TermionMouseEvent::Press(mouse_button, x, y) => JoshutoEvent::Mouse(
+                    JoshutoMouseEvent::Press(JoshutoMouseButton::from(mouse_button), x, y),
+                ),
+                TermionMouseEvent::Release(x, y) => {
+                    JoshutoEvent::Mouse(JoshutoMouseEvent::Release(x, y))
                 }
-            }
-            TermionEvent::Unsupported(unsupported) => {
-                todo!("impl unsupported")
-            }
+                TermionMouseEvent::Hold(x, y) => JoshutoEvent::Mouse(JoshutoMouseEvent::Hold(x, y)),
+            },
+            TermionEvent::Unsupported(unsupported) => JoshutoEvent::Unsupported(unsupported),
+        }
+    }
+}
+
+impl From<TermionMouseButton> for JoshutoMouseButton {
+    fn from(mouse_button: TermionMouseButton) -> Self {
+        match mouse_button {
+            TermionMouseButton::Left => JoshutoMouseButton::Left,
+            TermionMouseButton::Middle => JoshutoMouseButton::Middle,
+            TermionMouseButton::Right => JoshutoMouseButton::Right,
+            TermionMouseButton::WheelUp => JoshutoMouseButton::WheelUp,
+            TermionMouseButton::WheelDown => JoshutoMouseButton::WheelDown,
         }
     }
 }

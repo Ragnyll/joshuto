@@ -9,7 +9,6 @@ use crate::config::{search_directories, BookmarkRaw, BookmarksRaw};
 use crate::context::AppContext;
 use crate::error::JoshutoResult;
 use crate::event::{process_event, AppEvent};
-use crate::traits::ToString;
 use crate::ui::views::TuiView;
 use crate::ui::widgets::TuiMenu;
 use crate::ui::AppBackend;

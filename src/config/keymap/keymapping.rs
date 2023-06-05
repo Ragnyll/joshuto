@@ -8,7 +8,6 @@ use crate::event::joshuto_event::JoshutoEvent;
 use crate::config::{parse_config_or_default, TomlConfigFile};
 use crate::error::JoshutoResult;
 use crate::key_command::{AppCommand, Command, CommandKeybind};
-use crate::traits::ToString;
 use crate::util::keyparse::str_to_event;
 
 use super::DEFAULT_CONFIG_FILE_PATH;

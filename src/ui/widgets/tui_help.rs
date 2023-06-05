@@ -1,6 +1,5 @@
 use lazy_static::lazy_static;
 
-use termion::event::{Event, Key};
 use crate::event::joshuto_event::{JoshutoEvent, JoshutoKey};
 
 use tui::buffer::Buffer;
