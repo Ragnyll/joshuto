@@ -7,8 +7,7 @@ use signal_hook::consts::signal;
 use signal_hook::iterator::exfiltrator::SignalOnly;
 use signal_hook::iterator::SignalsInfo;
 
-use termion::event::Event;
-use termion::input::TermRead;
+//use termion::input::TermRead;
 
 use uuid::Uuid;
 
@@ -19,11 +18,8 @@ use crate::{
 
 #[derive(Debug)]
 pub enum AppEvent {
-    /// User input events
-    JoshutoBackend(JoshutoEvent),
-
     // User input events
-    Backend(Event),
+    Backend(JoshutoEvent),
 
     // background IO worker events
     IoWorkerCreate,

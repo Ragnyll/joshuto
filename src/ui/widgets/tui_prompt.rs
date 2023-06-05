@@ -9,6 +9,7 @@ use crate::event::process_event;
 use crate::event::AppEvent;
 use crate::ui::backend::traits::AppBackend;
 use crate::ui::views::TuiView;
+use crate::event::joshuto_event::JoshutoEvent;
 
 pub struct TuiPrompt<'a> {
     prompt: &'a str,

@@ -17,6 +17,7 @@ use crate::ui::AppBackend;
 use crate::util::unix;
 
 use crate::{BOOKMARKS_FILE, BOOKMARKS_T, CONFIG_HIERARCHY};
+use crate::event::joshuto_event::JoshutoEvent;
 
 use super::change_directory::change_directory;
 
@@ -87,7 +88,7 @@ pub fn change_directory_bookmark<T: AppBackend>(
 fn poll_for_bookmark_key<T: AppBackend>(
     context: &mut AppContext,
     backend: &mut T,
-) -> Option<Event> {
+) -> Option<JoshutoEvent> {
     context.flush_event();
 
     let mut bookmarks: Vec<String> = BOOKMARKS_T
@@ -133,7 +134,7 @@ fn poll_for_bookmark_key<T: AppBackend>(
 
         if let Ok(event) = context.poll_event() {
             match event {
-                AppEvent::Backend(key) => return Some(key),
+                AppEvent::Backend(key) => return Some(JoshutoEvent::from(key)),
                 event => process_event::process_noninteractive(event, context),
             };
         }
