@@ -7,7 +7,7 @@ use signal_hook::consts::signal;
 use signal_hook::iterator::exfiltrator::SignalOnly;
 use signal_hook::iterator::SignalsInfo;
 
-//use termion::input::TermRead;
+use termion::input::TermRead;
 
 use uuid::Uuid;
 
@@ -103,6 +103,7 @@ impl std::default::Default for Events {
 
             while input_rx.recv().is_ok() {
                 if let Some(Ok(event)) = events.next() {
+                    let event = JoshutoEvent::from(event);
                     let _ = event_tx2.send(AppEvent::Backend(event));
                 }
             }

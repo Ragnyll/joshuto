@@ -2,7 +2,6 @@ use std::fs::File;
 use std::io::Write;
 use std::path;
 
-use termion::event::Event;
 use tui::layout::Rect;
 use tui::widgets::Clear;
 

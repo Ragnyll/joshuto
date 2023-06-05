@@ -3,7 +3,7 @@ use std::{fmt::Debug, string::ToString};
 /// An internal type used to route various backend event types through. For example termion and
 /// crossterm both have their own event types which can change however they want but it must be
 /// able to convert to a JoshutoEvent
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoshutoEvent {
     /// A key press.
     Key(JoshutoKey),
@@ -16,7 +16,7 @@ pub enum JoshutoEvent {
 /// All the keys supported by Joshuto. Different backends support different keys and have different
 /// schemes for receiving modifiers. In Order to use a backend a mapping from its Key definition
 /// must exist to convert all keys into `JoshutoKey`s
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoshutoKey {
     /// Backspace.
     Backspace,
@@ -87,7 +87,7 @@ impl ToString for JoshutoKey {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoshutoMouseEvent {
     /// A mouse button was pressed.
     ///
