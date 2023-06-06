@@ -29,8 +29,10 @@ impl From<TermionEvent> for JoshutoEvent {
                 TermionKey::Ctrl(char) => JoshutoEvent::Key(JoshutoKey::Ctrl(char)),
                 TermionKey::Null => JoshutoEvent::Key(JoshutoKey::Null),
                 TermionKey::Esc => JoshutoEvent::Key(JoshutoKey::Esc),
-                // kinda sus
-                _ => JoshutoEvent::Unsupported(vec![0_u8]),
+                // TODO: kinda sus
+                _ => {
+                    JoshutoEvent::Unsupported(vec![0_u8])
+                },
             },
             TermionEvent::Mouse(mouse_event) => match mouse_event {
                 TermionMouseEvent::Press(mouse_button, x, y) => JoshutoEvent::Mouse(
