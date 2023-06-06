@@ -37,9 +37,9 @@ pub fn zoxide_query(context: &mut AppContext, args: &str) -> JoshutoResult {
     Ok(())
 }
 
-pub fn zoxide_query_interactive(
+pub fn zoxide_query_interactive<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
 ) -> JoshutoResult {
     backend.terminal_drop();
 

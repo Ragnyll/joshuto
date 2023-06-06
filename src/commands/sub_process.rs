@@ -47,9 +47,9 @@ fn execute_sub_process(
 }
 
 /// Handler for Joshuto's `shell` and `spawn` commands.
-pub fn sub_process(
+pub fn sub_process<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     words: &[String],
     spawn: bool,
 ) -> JoshutoResult {

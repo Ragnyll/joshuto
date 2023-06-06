@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 
-use termion::event::{Event, Key};
+use crate::event::joshuto_event::{JoshutoEvent, JoshutoKey};
 
 use tui::buffer::Buffer;
 use tui::layout::{Constraint, Rect};
@@ -151,31 +151,31 @@ pub fn get_raw_keymap_table<'a>(
     rows
 }
 
-fn key_event_to_string(event: &Event) -> String {
+fn key_event_to_string(event: &JoshutoEvent) -> String {
     match event {
-        Event::Key(key) => match key {
-            Key::Backspace => "Backspace".to_string(),
-            Key::Left => "Left".to_string(),
-            Key::Right => "Right".to_string(),
-            Key::Up => "Up".to_string(),
-            Key::Down => "Down".to_string(),
-            Key::Home => "Home".to_string(),
-            Key::End => "End".to_string(),
-            Key::PageUp => "PageUp".to_string(),
-            Key::PageDown => "PageDown".to_string(),
-            Key::BackTab => "BackTab".to_string(),
-            Key::Delete => "Delete".to_string(),
-            Key::Insert => "Insert".to_string(),
-            Key::Esc => "Esc".to_string(),
-            Key::F(n) => format!("F{}", n),
-            Key::Char(chr) => match chr {
+        JoshutoEvent::Key(key) => match key {
+            JoshutoKey::Backspace => "Backspace".to_string(),
+            JoshutoKey::Left => "Left".to_string(),
+            JoshutoKey::Right => "Right".to_string(),
+            JoshutoKey::Up => "Up".to_string(),
+            JoshutoKey::Down => "Down".to_string(),
+            JoshutoKey::Home => "Home".to_string(),
+            JoshutoKey::End => "End".to_string(),
+            JoshutoKey::PageUp => "PageUp".to_string(),
+            JoshutoKey::PageDown => "PageDown".to_string(),
+            JoshutoKey::BackTab => "BackTab".to_string(),
+            JoshutoKey::Delete => "Delete".to_string(),
+            JoshutoKey::Insert => "Insert".to_string(),
+            JoshutoKey::Esc => "Esc".to_string(),
+            JoshutoKey::F(n) => format!("F{}", n),
+            JoshutoKey::Char(chr) => match chr {
                 ' ' => "Space".to_string(),
                 '\t' => "Tab".to_string(),
                 '\n' => "Enter".to_string(),
                 chr => chr.to_string(),
             },
-            Key::Alt(chr) => format!("Alt+{}", chr),
-            Key::Ctrl(chr) => format!("Ctrl+{}", chr),
+            JoshutoKey::Alt(chr) => format!("Alt+{}", chr),
+            JoshutoKey::Ctrl(chr) => format!("Ctrl+{}", chr),
             _ => "".to_string(),
         },
         _ => "".to_string(),

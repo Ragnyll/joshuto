@@ -1,7 +1,6 @@
 use std::cmp::Ordering;
 
-use termion::event::{Event, Key};
-
+use crate::event::joshuto_event::{JoshutoEvent, JoshutoKey};
 use crate::config::AppKeyMapping;
 use crate::context::AppContext;
 use crate::error::JoshutoResult;
@@ -12,9 +11,9 @@ use crate::ui::widgets;
 use crate::ui::widgets::TuiHelp;
 use crate::ui::AppBackend;
 
-pub fn help_loop(
+pub fn help_loop<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
     context.flush_event();
@@ -39,14 +38,14 @@ pub fn help_loop(
         };
 
         match event {
-            AppEvent::Termion(event) => {
+            AppEvent::Backend(event) => {
                 if search_query.is_empty() {
                     match event {
-                        Event::Key(Key::Esc) => break,
-                        Event::Key(Key::Char('1')) => sort_by = 0,
-                        Event::Key(Key::Char('2')) => sort_by = 1,
-                        Event::Key(Key::Char('3')) => sort_by = 2,
-                        Event::Key(Key::Char('/')) => search_query.push('/'),
+                        JoshutoEvent::Key(JoshutoKey::Esc) => break,
+                        JoshutoEvent::Key(JoshutoKey::Char('1')) => sort_by = 0,
+                        JoshutoEvent::Key(JoshutoKey::Char('2')) => sort_by = 1,
+                        JoshutoEvent::Key(JoshutoKey::Char('3')) => sort_by = 2,
+                        JoshutoEvent::Key(JoshutoKey::Char('/')) => search_query.push('/'),
                         event => {
                             if let Some(CommandKeybind::SimpleKeybind(command)) =
                                 keymap_t.help_view.get(&event)
@@ -66,11 +65,11 @@ pub fn help_loop(
                     }
                 } else {
                     match event {
-                        Event::Key(Key::Esc) => search_query.clear(),
-                        Event::Key(Key::Backspace) => {
+                        JoshutoEvent::Key(JoshutoKey::Esc) => search_query.clear(),
+                        JoshutoEvent::Key(JoshutoKey::Backspace) => {
                             search_query.pop();
                         }
-                        Event::Key(Key::Char(chr)) => search_query.push(chr),
+                        JoshutoEvent::Key(JoshutoKey::Char(chr)) => search_query.push(chr),
                         _ => (),
                     }
                 }

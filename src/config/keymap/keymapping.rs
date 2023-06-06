@@ -4,12 +4,10 @@ use std::collections::{hash_map::Entry, HashMap};
 use std::convert::From;
 use std::str::FromStr;
 
-use termion::event::Event;
-
+use crate::event::joshuto_event::JoshutoEvent;
 use crate::config::{parse_config_or_default, TomlConfigFile};
 use crate::error::JoshutoResult;
 use crate::key_command::{AppCommand, Command, CommandKeybind};
-use crate::traits::ToString;
 use crate::util::keyparse::str_to_event;
 
 use super::DEFAULT_CONFIG_FILE_PATH;
@@ -37,7 +35,7 @@ struct AppKeyMappingRaw {
     pub help_view: AppModeKeyMapping,
 }
 
-pub type KeyMapping = HashMap<Event, CommandKeybind>;
+pub type KeyMapping = HashMap<JoshutoEvent, CommandKeybind>;
 
 #[derive(Debug)]
 pub struct AppKeyMapping {
@@ -62,13 +60,13 @@ impl AppKeyMapping {
     }
 }
 
-fn vec_to_map(vec: &[CommandKeymap]) -> HashMap<Event, CommandKeybind> {
+fn vec_to_map(vec: &[CommandKeymap]) -> HashMap<JoshutoEvent, CommandKeybind> {
     let mut hashmap = HashMap::new();
 
     for m in vec {
         match Command::from_str(m.command.as_str()) {
             Ok(command) => {
-                let events: Vec<Event> = m
+                let events: Vec<JoshutoEvent> = m
                     .keys
                     .iter()
                     .filter_map(|s| str_to_event(s.as_str()))
@@ -125,7 +123,7 @@ impl std::default::Default for AppKeyMapping {
 fn insert_keycommand(
     keymap: &mut KeyMapping,
     keycommand: Command,
-    events: &[Event],
+    events: &[JoshutoEvent],
 ) -> Result<(), KeymapError> {
     let num_events = events.len();
     if num_events == 0 {

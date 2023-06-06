@@ -63,9 +63,9 @@ fn _get_current_file_name(context: &mut AppContext) -> Option<String> {
         .and_then(|list| list.curr_entry_ref().map(|s| s.file_name().to_string()))
 }
 
-pub fn rename_file_append(
+pub fn rename_file_append<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
     if let Some(file_name) = _get_current_file_name(context) {
@@ -81,9 +81,9 @@ pub fn rename_file_append(
     Ok(())
 }
 
-pub fn rename_file_prepend(
+pub fn rename_file_prepend<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
     if let Some(file_name) = _get_current_file_name(context) {
@@ -93,9 +93,9 @@ pub fn rename_file_prepend(
     Ok(())
 }
 
-pub fn rename_file_keep_ext(
+pub fn rename_file_keep_ext<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
     if let Some(file_name) = _get_current_file_name(context) {

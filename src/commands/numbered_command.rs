@@ -1,4 +1,4 @@
-use termion::event::{Event, Key};
+use crate::event::joshuto_event::{JoshutoEvent, JoshutoKey};
 
 use crate::commands::cursor_move;
 use crate::config::AppKeyMapping;
@@ -10,9 +10,9 @@ use crate::key_command::{CommandKeybind, NumberedExecute};
 use crate::ui::views::TuiView;
 use crate::ui::AppBackend;
 
-pub fn numbered_command(
+pub fn numbered_command<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap: &AppKeyMapping,
     first_char: char,
 ) -> JoshutoResult {
@@ -41,14 +41,14 @@ pub fn numbered_command(
         };
 
         match event {
-            AppEvent::Termion(event) => {
+            AppEvent::Backend(event) => {
                 match event {
-                    Event::Key(Key::Esc) => return Ok(()),
-                    Event::Key(Key::Char('g')) => {
+                    JoshutoEvent::Key(JoshutoKey::Esc) => return Ok(()),
+                    JoshutoEvent::Key(JoshutoKey::Char('g')) => {
                         cursor_move::cursor_move(context, num_prefix - 1);
                         return Ok(());
                     }
-                    Event::Key(Key::Char(c)) if c.is_numeric() => {
+                    JoshutoEvent::Key(JoshutoKey::Char(c)) if c.is_numeric() => {
                         prefix.push(c);
                     }
                     key => match keymap.default_view.get(&key) {

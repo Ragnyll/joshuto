@@ -2,7 +2,6 @@ use std::fs::File;
 use std::io::Write;
 use std::path;
 
-use termion::event::Event;
 use tui::layout::Rect;
 use tui::widgets::Clear;
 
@@ -10,13 +9,13 @@ use crate::config::{search_directories, BookmarkRaw, BookmarksRaw};
 use crate::context::AppContext;
 use crate::error::JoshutoResult;
 use crate::event::{process_event, AppEvent};
-use crate::traits::ToString;
 use crate::ui::views::TuiView;
 use crate::ui::widgets::TuiMenu;
 use crate::ui::AppBackend;
 use crate::util::unix;
 
 use crate::{BOOKMARKS_FILE, BOOKMARKS_T, CONFIG_HIERARCHY};
+use crate::event::joshuto_event::JoshutoEvent;
 
 use super::change_directory::change_directory;
 
@@ -29,7 +28,7 @@ fn find_bookmark_file() -> Option<path::PathBuf> {
     None
 }
 
-pub fn add_bookmark(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn add_bookmark<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     let cwd = std::env::current_dir()?;
 
     let bookmark_path = match search_directories(BOOKMARKS_FILE, &CONFIG_HIERARCHY) {
@@ -67,9 +66,9 @@ pub fn add_bookmark(context: &mut AppContext, backend: &mut AppBackend) -> Joshu
     Ok(())
 }
 
-pub fn change_directory_bookmark(
+pub fn change_directory_bookmark<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
 ) -> JoshutoResult {
     let key = poll_for_bookmark_key(context, backend);
 
@@ -84,7 +83,10 @@ pub fn change_directory_bookmark(
     Ok(())
 }
 
-fn poll_for_bookmark_key(context: &mut AppContext, backend: &mut AppBackend) -> Option<Event> {
+fn poll_for_bookmark_key<T: AppBackend>(
+    context: &mut AppContext,
+    backend: &mut T,
+) -> Option<JoshutoEvent> {
     context.flush_event();
 
     let mut bookmarks: Vec<String> = BOOKMARKS_T
@@ -130,7 +132,7 @@ fn poll_for_bookmark_key(context: &mut AppContext, backend: &mut AppBackend) -> 
 
         if let Ok(event) = context.poll_event() {
             match event {
-                AppEvent::Termion(key) => return Some(key),
+                AppEvent::Backend(key) => return Some(JoshutoEvent::from(key)),
                 event => process_event::process_noninteractive(event, context),
             };
         }

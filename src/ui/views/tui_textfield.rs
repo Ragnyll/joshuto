@@ -6,7 +6,7 @@ use rustyline::{
     At, Word,
 };
 
-use termion::event::{Event, Key};
+use crate::event::joshuto_event::{JoshutoEvent, JoshutoKey};
 use tui::layout::Rect;
 use tui::widgets::Clear;
 use unicode_width::UnicodeWidthStr;
@@ -74,9 +74,9 @@ impl<'a> TuiTextField<'a> {
         self
     }
 
-    pub fn get_input(
+    pub fn get_input<T: AppBackend>(
         &mut self,
-        backend: &mut AppBackend,
+        backend: &mut T,
         context: &mut AppContext,
     ) -> Option<String> {
         let mut line_buffer = line_buffer::LineBuffer::with_capacity(255);
@@ -166,9 +166,9 @@ impl<'a> TuiTextField<'a> {
 
             if let Ok(event) = context.poll_event() {
                 match event {
-                    AppEvent::Termion(Event::Key(key)) => {
+                    AppEvent::Backend(JoshutoEvent::Key(key)) => {
                         let dirty = match key {
-                            Key::Backspace => {
+                            JoshutoKey::Backspace => {
                                 let res = line_buffer.backspace(1);
 
                                 if let Ok(command) = Command::from_str(line_buffer.as_str()) {
@@ -176,10 +176,10 @@ impl<'a> TuiTextField<'a> {
                                 }
                                 res
                             }
-                            Key::Delete => line_buffer.delete(1).is_some(),
-                            Key::Home => line_buffer.move_home(),
-                            Key::End => line_buffer.move_end(),
-                            Key::Up => {
+                            JoshutoKey::Delete => line_buffer.delete(1).is_some(),
+                            JoshutoKey::Home => line_buffer.move_home(),
+                            JoshutoKey::End => line_buffer.move_end(),
+                            JoshutoKey::Up => {
                                 curr_history_index = curr_history_index.saturating_sub(1);
                                 line_buffer.move_home();
                                 line_buffer.kill_line();
@@ -192,7 +192,7 @@ impl<'a> TuiTextField<'a> {
                                 }
                                 true
                             }
-                            Key::Down => {
+                            JoshutoKey::Down => {
                                 curr_history_index = if curr_history_index
                                     < context.commandline_context_ref().history_ref().len()
                                 {
@@ -211,17 +211,17 @@ impl<'a> TuiTextField<'a> {
                                 }
                                 true
                             }
-                            Key::Esc => {
+                            JoshutoKey::Esc => {
                                 let _ = terminal.hide_cursor();
                                 return None;
                             }
-                            Key::Char('\t') => autocomplete(
+                            JoshutoKey::Char('\t') => autocomplete(
                                 &mut line_buffer,
                                 &mut completion_tracker,
                                 &completer,
                                 false,
                             ),
-                            Key::BackTab => autocomplete(
+                            JoshutoKey::BackTab => autocomplete(
                                 &mut line_buffer,
                                 &mut completion_tracker,
                                 &completer,
@@ -230,44 +230,44 @@ impl<'a> TuiTextField<'a> {
 
                             // Current `completion_tracker` should be dropped
                             // only if we moved to another word
-                            Key::Ctrl('a') => {
+                            JoshutoKey::Ctrl('a') => {
                                 moved_to_another_word(&mut line_buffer, |line_buffer| {
                                     line_buffer.move_home()
                                 })
                             }
-                            Key::Ctrl('e') => {
+                            JoshutoKey::Ctrl('e') => {
                                 moved_to_another_word(&mut line_buffer, |line_buffer| {
                                     line_buffer.move_end()
                                 })
                             }
-                            Key::Ctrl('f') | Key::Right => {
+                            JoshutoKey::Ctrl('f') | JoshutoKey::Right => {
                                 moved_to_another_word(&mut line_buffer, |line_buffer| {
                                     line_buffer.move_forward(1)
                                 })
                             }
-                            Key::Ctrl('b') | Key::Left => {
+                            JoshutoKey::Ctrl('b') | JoshutoKey::Left => {
                                 moved_to_another_word(&mut line_buffer, |line_buffer| {
                                     line_buffer.move_backward(1)
                                 })
                             }
-                            Key::Alt('f') => {
+                            JoshutoKey::Alt('f') => {
                                 moved_to_another_word(&mut line_buffer, |line_buffer| {
                                     line_buffer.move_to_next_word(At::Start, Word::Vi, 1)
                                 })
                             }
-                            Key::Alt('b') => {
+                            JoshutoKey::Alt('b') => {
                                 moved_to_another_word(&mut line_buffer, |line_buffer| {
                                     line_buffer.move_to_prev_word(Word::Vi, 1)
                                 })
                             }
 
-                            Key::Ctrl('w') => line_buffer.delete_prev_word(Word::Vi, 1),
-                            Key::Ctrl('u') => line_buffer.discard_line(),
-                            Key::Ctrl('d') => line_buffer.delete(1).is_some(),
-                            Key::Char('\n') => {
+                            JoshutoKey::Ctrl('w') => line_buffer.delete_prev_word(Word::Vi, 1),
+                            JoshutoKey::Ctrl('u') => line_buffer.discard_line(),
+                            JoshutoKey::Ctrl('d') => line_buffer.delete(1).is_some(),
+                            JoshutoKey::Char('\n') => {
                                 break;
                             }
-                            Key::Char(c) => {
+                            JoshutoKey::Char(c) => {
                                 let dirty = line_buffer.insert(c, 1).is_some();
 
                                 if let Ok(command) = Command::from_str(line_buffer.as_str()) {
@@ -282,7 +282,7 @@ impl<'a> TuiTextField<'a> {
                         }
                         context.flush_event();
                     }
-                    AppEvent::Termion(_) => {
+                    AppEvent::Backend(_) => {
                         context.flush_event();
                     }
                     event => process_event::process_noninteractive(event, context),

@@ -4,13 +4,12 @@ use crate::error::JoshutoResult;
 use crate::event::process_event;
 use crate::event::AppEvent;
 use crate::key_command::{Command, CommandKeybind};
-use crate::traits::ToString;
 use crate::ui::views::TuiWorkerView;
 use crate::ui::AppBackend;
 
-pub fn show_tasks(
+pub fn show_tasks<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) -> JoshutoResult {
     context.flush_event();
@@ -20,7 +19,7 @@ pub fn show_tasks(
 
         if let Ok(event) = context.poll_event() {
             match event {
-                AppEvent::Termion(key) => {
+                AppEvent::Backend(key) => {
                     let key = key;
                     match keymap_t.task_view.get(&key) {
                         None => {

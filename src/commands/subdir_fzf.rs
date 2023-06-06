@@ -9,7 +9,7 @@ use crate::ui::AppBackend;
 
 use super::change_directory::change_directory;
 
-pub fn subdir_fzf(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn subdir_fzf<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     let fzf_default_command = std::env::var("FZF_DEFAULT_COMMAND")?;
 
     backend.terminal_drop();

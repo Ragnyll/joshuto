@@ -120,9 +120,9 @@ pub fn end(context: &mut AppContext) -> JoshutoResult {
     Ok(())
 }
 
-fn get_page_size(context: &AppContext, backend: &AppBackend) -> Option<usize> {
+fn get_page_size<T: AppBackend>(context: &AppContext, backend: &T) -> Option<usize> {
     let config = context.config_ref();
-    let rect = backend.terminal.as_ref().map(|t| t.size())?.ok()?;
+    let rect = backend.terminal().as_ref().map(|t| t.size())?.ok()?;
 
     let rect_height = rect.height as usize;
     if config.display_options_ref().show_borders() {
@@ -138,9 +138,9 @@ fn get_page_size(context: &AppContext, backend: &AppBackend) -> Option<usize> {
     }
 }
 
-pub fn page_up(
+pub fn page_up<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     proportion: f64,
 ) -> JoshutoResult {
     let page_size = get_page_size(context, backend).unwrap_or(10) as f64 * proportion;
@@ -158,9 +158,9 @@ pub fn page_up(
     Ok(())
 }
 
-pub fn page_down(
+pub fn page_down<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     proportion: f64,
 ) -> JoshutoResult {
     let page_size = get_page_size(context, backend).unwrap_or(10) as f64 * proportion;
@@ -178,7 +178,7 @@ pub fn page_down(
     Ok(())
 }
 
-pub fn page_home(context: &mut AppContext, _: &mut AppBackend) -> JoshutoResult {
+pub fn page_home<T: AppBackend>(context: &mut AppContext, _: &mut T) -> JoshutoResult {
     let new_index = context
         .tab_context_ref()
         .curr_tab_ref()
@@ -190,7 +190,7 @@ pub fn page_home(context: &mut AppContext, _: &mut AppBackend) -> JoshutoResult 
     Ok(())
 }
 
-pub fn page_middle(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn page_middle<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     let movement = get_page_size(context, backend).unwrap_or(10) / 2;
 
     let new_index = context
@@ -204,7 +204,7 @@ pub fn page_middle(context: &mut AppContext, backend: &mut AppBackend) -> Joshut
     Ok(())
 }
 
-pub fn page_end(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn page_end<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     let movement = get_page_size(context, backend).unwrap_or(10) - 1;
 
     let new_index = context

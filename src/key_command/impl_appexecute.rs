@@ -7,10 +7,10 @@ use crate::ui::AppBackend;
 use super::{AppExecute, Command};
 
 impl AppExecute for Command {
-    fn execute(
+    fn execute<T: AppBackend>(
         &self,
         context: &mut AppContext,
-        backend: &mut AppBackend,
+        backend: &mut T,
         keymap_t: &AppKeyMapping,
     ) -> JoshutoResult {
         match self {

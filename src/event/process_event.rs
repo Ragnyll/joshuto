@@ -3,10 +3,10 @@ use std::path;
 
 use notify;
 use signal_hook::consts::signal;
-use termion::event::{Event, Key, MouseButton, MouseEvent};
 use tui::layout::{Constraint, Direction, Layout};
 use uuid::Uuid;
 
+use crate::event::joshuto_event::{JoshutoEvent, JoshutoKey, JoshutoMouseButton, JoshutoMouseEvent};
 use crate::commands::{cursor_move, parent_cursor_move, reload};
 use crate::config::{AppKeyMapping, KeyMapping};
 use crate::context::AppContext;
@@ -21,8 +21,8 @@ use crate::ui;
 use crate::ui::views::TuiCommandMenu;
 use crate::util::format;
 
-pub fn poll_event_until_simple_keybind<'a>(
-    backend: &mut ui::AppBackend,
+pub fn poll_event_until_simple_keybind<'a, T: ui::AppBackend>(
+    backend: &mut T,
     context: &mut AppContext,
     keymap: &'a KeyMapping,
 ) -> Option<&'a Command> {
@@ -35,9 +35,9 @@ pub fn poll_event_until_simple_keybind<'a>(
 
         if let Ok(event) = context.poll_event() {
             match event {
-                AppEvent::Termion(event) => {
+                AppEvent::Backend(event) => {
                     match event {
-                        Event::Key(Key::Esc) => return None,
+                        JoshutoEvent::Key(JoshutoKey::Esc) => return None,
                         event => match keymap.get(&event) {
                             Some(CommandKeybind::SimpleKeybind(s)) => {
                                 return Some(s);
@@ -56,6 +56,7 @@ pub fn poll_event_until_simple_keybind<'a>(
     }
 }
 
+/// TODO: This needs some documentation
 pub fn process_noninteractive(event: AppEvent, context: &mut AppContext) {
     match event {
         AppEvent::IoWorkerCreate => process_new_worker(context),
@@ -203,9 +204,9 @@ pub fn process_file_preview(
     }
 }
 
-pub fn process_unsupported(
+pub fn process_unsupported<T: ui::AppBackend>(
     context: &mut AppContext,
-    backend: &mut ui::AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
     event: Vec<u8>,
 ) {
@@ -247,13 +248,13 @@ fn children_cursor_move(context: &mut AppContext, new_index: usize) {
     }
 }
 
-pub fn process_mouse(
-    event: MouseEvent,
+pub fn process_mouse<T: ui::AppBackend>(
+    event: JoshutoMouseEvent,
     context: &mut AppContext,
-    backend: &mut ui::AppBackend,
+    backend: &mut T,
     keymap_t: &AppKeyMapping,
 ) {
-    let f_size = backend.terminal.as_ref().unwrap().size().unwrap();
+    let f_size = backend.terminal().as_ref().unwrap().size().unwrap();
 
     let constraints: &[Constraint; 3] = &context.config_ref().display_options_ref().default_layout;
     let vertical_margin = if context.config_ref().display_options_ref().show_borders() {
@@ -269,7 +270,7 @@ pub fn process_mouse(
         .split(f_size);
 
     match event {
-        MouseEvent::Press(MouseButton::WheelUp, x, _) => {
+        JoshutoMouseEvent::Press(JoshutoMouseButton::WheelUp, x, _) => {
             if x < layout_rect[1].x {
                 let command = Command::ParentCursorMoveUp { offset: 1 };
                 if let Err(e) = command.execute(context, backend, keymap_t) {
@@ -284,7 +285,7 @@ pub fn process_mouse(
                 // TODO: scroll in child list
             }
         }
-        MouseEvent::Press(MouseButton::WheelDown, x, _) => {
+        JoshutoMouseEvent::Press(JoshutoMouseButton::WheelDown, x, _) => {
             if x < layout_rect[1].x {
                 let command = Command::ParentCursorMoveDown { offset: 1 };
                 if let Err(e) = command.execute(context, backend, keymap_t) {
@@ -299,8 +300,8 @@ pub fn process_mouse(
                 // TODO: scroll in child list
             }
         }
-        MouseEvent::Press(button @ MouseButton::Left, x, y)
-        | MouseEvent::Press(button @ MouseButton::Right, x, y) => {
+        JoshutoMouseEvent::Press(button @ JoshutoMouseButton::Left, x, y)
+        | JoshutoMouseEvent::Press(button @ JoshutoMouseButton::Right, x, y) => {
             if y > layout_rect[1].y && y <= layout_rect[1].y + layout_rect[1].height {
                 let (dirlist, panel) = if x < layout_rect[1].x {
                     (
@@ -328,7 +329,7 @@ pub fn process_mouse(
                             {
                                 context.message_queue_mut().push_error(e.to_string());
                             };
-                            if button == MouseButton::Left {
+                            if button == JoshutoMouseButton::Left {
                                 let command = Command::ChangeDirectory {
                                     path: path::PathBuf::from(".."),
                                 };
@@ -339,7 +340,7 @@ pub fn process_mouse(
                         }
                         Some(Panel::Current) => {
                             cursor_move::cursor_move(context, new_index);
-                            if button == MouseButton::Right {
+                            if button == JoshutoMouseButton::Right {
                                 let command = Command::OpenFile;
                                 if let Err(e) = command.execute(context, backend, keymap_t) {
                                     context.message_queue_mut().push_error(e.to_string());
@@ -348,7 +349,7 @@ pub fn process_mouse(
                         }
                         Some(Panel::Preview) => {
                             children_cursor_move(context, new_index);
-                            if button == MouseButton::Left {
+                            if button == JoshutoMouseButton::Left {
                                 let command = Command::OpenFile;
                                 if let Err(e) = command.execute(context, backend, keymap_t) {
                                     context.message_queue_mut().push_error(e.to_string());

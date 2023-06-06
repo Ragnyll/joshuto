@@ -11,11 +11,11 @@ use super::{Command, NumberedExecute};
 // for easier navigation. You don't have to implement this for every command
 impl NumberedExecute for Command {
     #[allow(unused)] // backend and keymap_t args are not used, but they probably will be
-    fn numbered_execute(
+    fn numbered_execute<T: AppBackend>(
         &self,
         number_prefix: usize,
         context: &mut AppContext,
-        backend: &mut AppBackend,
+        backend: &mut T,
         keymap_t: &AppKeyMapping,
     ) -> JoshutoResult {
         match self {

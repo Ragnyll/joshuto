@@ -36,7 +36,7 @@ pub fn str_to_mode(s: &str) -> u32 {
     mode
 }
 
-pub fn set_mode(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn set_mode<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     #[cfg(unix)]
     use std::os::unix::fs::PermissionsExt;
 

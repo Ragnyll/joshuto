@@ -4,14 +4,14 @@ pub use self::bookmarks_raw::*;
 
 use std::collections::HashMap;
 
-use termion::event::Event;
+use crate::event::joshuto_event::JoshutoEvent;
 
 use crate::config::TomlConfigFile;
 use crate::util::keyparse;
 
 use super::parse_config_or_default;
 
-pub type Bookmarks = HashMap<Event, String>;
+pub type Bookmarks = HashMap<JoshutoEvent, String>;
 
 impl From<BookmarksRaw> for Bookmarks {
     fn from(raw: BookmarksRaw) -> Self {

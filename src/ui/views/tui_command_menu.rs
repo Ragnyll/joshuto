@@ -6,7 +6,6 @@ use tui::widgets::{Clear, Widget};
 
 use crate::config::KeyMapping;
 use crate::context::AppContext;
-use crate::traits::ToString;
 use crate::ui::views::TuiView;
 use crate::ui::widgets::TuiMenu;
 

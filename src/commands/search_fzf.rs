@@ -7,7 +7,7 @@ use crate::context::AppContext;
 use crate::error::{JoshutoError, JoshutoErrorKind, JoshutoResult};
 use crate::ui::AppBackend;
 
-pub fn search_fzf(context: &mut AppContext, backend: &mut AppBackend) -> JoshutoResult {
+pub fn search_fzf<T: AppBackend>(context: &mut AppContext, backend: &mut T) -> JoshutoResult {
     let items = context
         .tab_context_ref()
         .curr_tab_ref()

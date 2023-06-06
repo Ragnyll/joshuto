@@ -7,19 +7,23 @@ use signal_hook::consts::signal;
 use signal_hook::iterator::exfiltrator::SignalOnly;
 use signal_hook::iterator::SignalsInfo;
 
-use termion::event::Event;
-use termion::input::TermRead;
+//use termion::input::TermRead; This should be turned on as the default feature or termion feature
+pub use crossterm::{
+    cursor,
+    event::{self, Event, KeyCode, KeyEvent, KeyEventKind}
+};
 
 use uuid::Uuid;
 
-use crate::fs::JoshutoDirList;
-use crate::io::FileOperationProgress;
-use crate::preview::preview_file::FilePreview;
+use crate::{
+    event::joshuto_event::JoshutoEvent, fs::JoshutoDirList, io::FileOperationProgress,
+    preview::preview_file::FilePreview,
+};
 
 #[derive(Debug)]
 pub enum AppEvent {
     // User input events
-    Termion(Event),
+    Backend(JoshutoEvent),
 
     // background IO worker events
     IoWorkerCreate,
@@ -48,7 +52,7 @@ pub enum AppEvent {
 #[derive(Default, Debug, Clone, Copy)]
 pub struct Config {}
 
-/// A small event handler that wrap termion input and tick events. Each event
+/// A small event handler that wrap Terminal input and tick events. Each event
 /// type is handled in its own thread and returned to a common `Receiver`
 pub struct Events {
     pub event_tx: mpsc::Sender<AppEvent>,
@@ -99,11 +103,16 @@ impl std::default::Default for Events {
         let event_tx2 = event_tx.clone();
         let _ = thread::spawn(move || {
             let stdin = io::stdin();
-            let mut events = stdin.events();
+            //let mut events = stdin.events();
+            let event = event::read();
+            // TODO this def should not be unwrapped
+            let event = JoshutoEvent::from(event.unwrap());
+            let _ = event_tx2.send(AppEvent::Backend(event));
 
             while input_rx.recv().is_ok() {
                 if let Some(Ok(event)) = events.next() {
-                    let _ = event_tx2.send(AppEvent::Termion(event));
+                    let event = JoshutoEvent::from(event);
+                    let _ = event_tx2.send(AppEvent::Backend(event));
                 }
             }
         });

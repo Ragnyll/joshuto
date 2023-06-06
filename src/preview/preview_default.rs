@@ -7,9 +7,9 @@ use crate::ui::AppBackend;
 
 use super::preview_file::PreviewFileState;
 
-pub fn load_preview_path(
+pub fn load_preview_path<T: AppBackend>(
     context: &mut AppContext,
-    backend: &mut AppBackend,
+    backend: &mut T,
     p: path::PathBuf,
     metadata: JoshutoMetadata,
 ) {
@@ -50,7 +50,7 @@ pub fn load_preview_path(
     }
 }
 
-pub fn load_preview(context: &mut AppContext, backend: &mut AppBackend) {
+pub fn load_preview<T: AppBackend>(context: &mut AppContext, backend: &mut T) {
     let mut load_list = Vec::with_capacity(2);
 
     let curr_tab = context.tab_context_ref().curr_tab_ref();
